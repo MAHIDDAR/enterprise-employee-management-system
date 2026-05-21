@@ -1,0 +1,89 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f1f5f9;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+.light {
+  background: #f1f5f9;
+  color: #111827;
+  min-height: 100vh;
+}
+
+.dark {
+  background: #0f172a;
+  color: white;
+  min-height: 100vh;
+}
+
+.dark .dashboard-card,
+.dark .chart-container,
+.dark .employee-table,
+.dark .user-card,
+.dark .navbar,
+.dark .employee-card,
+.dark .department-card,
+.dark .attendance-card {
+  background: #1e293b;
+  color: white;
+}
+
+.dark input,
+.dark select {
+  background: #334155;
+  color: white;
+  border: none;
+}
+
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 40px;
+}
+
+.nav-item {
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.nav-item:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+.employee-list,
+.department-list,
+.attendance-list {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(250px, 1fr)
+  );
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.employee-card,
+.department-card,
+.attendance-card {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}

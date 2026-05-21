@@ -1,0 +1,48 @@
+.settings-page {
+  padding: 20px;
+}
+
+.settings-form {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.settings-form input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  width: 250px;
+}
+
+.settings-form button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #0f172a;
+  color: white;
+}
+
+.users-list {
+  margin-top: 30px;
+}
+
+.user-card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
