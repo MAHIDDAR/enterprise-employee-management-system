@@ -1,11 +1,14 @@
 import {
   useContext,
   useState,
+  useEffect,
 } from "react";
 
 import { EmployeeContext } from "../../context/EmployeeContext";
 
 import { SearchContext } from "../../context/SearchContext";
+
+import { fetchEmployees } from "../../services/employeeService";
 
 import "./EmployeesPage.css";
 
@@ -15,6 +18,12 @@ function EmployeesPage() {
 
   const { searchValue } =
     useContext(SearchContext);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   const [showModal, setShowModal] =
     useState(false);
@@ -38,6 +47,26 @@ function EmployeesPage() {
       city: "",
       phone: "",
     });
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
+
+  const loadEmployees = async () => {
+    try {
+      setLoading(true);
+
+      await fetchEmployees();
+
+      setError("");
+    } catch (error) {
+      console.log(error);
+
+      setError("Failed to load employees");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // INPUT CHANGE
   const handleChange = (event) => {
@@ -70,14 +99,15 @@ function EmployeesPage() {
     employees.filter((employee) => {
       const matchesSearch =
         employee.name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(
             searchValue.toLowerCase()
           );
 
       const matchesDepartment =
         departmentFilter === "" ||
-        employee.company?.name ===
+        (employee.company?.name ||
+          employee.department) ===
           departmentFilter;
 
       return (
@@ -123,6 +153,22 @@ function EmployeesPage() {
       employeesPerPage
   );
 
+  if (loading) {
+    return (
+      <div className="dashboard-message">
+        Loading employees...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-message error">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="employees-page">
       {/* HEADER */}
@@ -158,8 +204,8 @@ function EmployeesPage() {
             ...new Set(
               employees.map(
                 (employee) =>
-                  employee.company
-                    ?.name
+                  employee.company?.name ||
+                  employee.department
               )
             ),
           ].map((department, index) => (
@@ -306,9 +352,9 @@ function EmployeesPage() {
       {/* EMPLOYEE LIST */}
       <div className="employee-list">
         {currentEmployees.map(
-          (employee) => (
+          (employee, index) => (
             <div
-              key={employee.id}
+              key={employee.id || index}
               id={`employee-${employee.id}`}
               className="employee-card"
             >
@@ -343,20 +389,18 @@ function EmployeesPage() {
                   <strong>
                     Department:
                   </strong>{" "}
-                  {
-                    employee.company
-                      ?.name
-                  }
+                  {employee.company?.name ||
+                    employee.department ||
+                    "N/A"}
                 </p>
 
                 <p>
                   <strong>
                     City:
                   </strong>{" "}
-                  {
-                    employee.address
-                      ?.city
-                  }
+                  {employee.address?.city ||
+                    employee.city ||
+                    "N/A"}
                 </p>
 
                 <p>
