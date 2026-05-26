@@ -4,17 +4,30 @@ import {
   useEffect,
 } from "react";
 
-import { EmployeeContext } from "../../context/EmployeeContext";
+import {
+  EmployeeContext,
+} from "../../context/EmployeeContext";
 
-import { SearchContext } from "../../context/SearchContext";
+import {
+  SearchContext,
+} from "../../context/SearchContext";
 
-import { fetchEmployees } from "../../services/employeeService";
+import {
+  fetchEmployees,
+  addEmployeeApi,
+  updateEmployeeApi,
+  deleteEmployeeApi,
+} from "../../services/employeeService";
 
 import "./EmployeesPage.css";
 
 function EmployeesPage() {
-  const { employees, addEmployee } =
-    useContext(EmployeeContext);
+
+  const {
+    employees,
+    setEmployees,
+    addNotification,
+  } = useContext(EmployeeContext);
 
   const { searchValue } =
     useContext(SearchContext);
@@ -25,11 +38,31 @@ function EmployeesPage() {
   const [error, setError] =
     useState("");
 
+  const [
+    successMessage,
+    setSuccessMessage,
+  ] = useState("");
+
   const [showModal, setShowModal] =
     useState(false);
 
-  const [departmentFilter, setDepartmentFilter] =
-    useState("");
+  const [deleteModal, setDeleteModal] =
+    useState(false);
+
+  const [
+    selectedEmployee,
+    setSelectedEmployee,
+  ] = useState(null);
+
+  const [
+    editEmployeeId,
+    setEditEmployeeId,
+  ] = useState(null);
+
+  const [
+    departmentFilter,
+    setDepartmentFilter,
+  ] = useState("");
 
   const [sortOrder, setSortOrder] =
     useState("");
@@ -37,7 +70,7 @@ function EmployeesPage() {
   const [currentPage, setCurrentPage] =
     useState(1);
 
-  const employeesPerPage = 4;
+  const employeesPerPage = 5;
 
   const [formData, setFormData] =
     useState({
@@ -53,23 +86,35 @@ function EmployeesPage() {
   }, []);
 
   const loadEmployees = async () => {
+
     try {
+
       setLoading(true);
 
-      await fetchEmployees();
+      const data =
+        await fetchEmployees();
+
+      setEmployees(data);
 
       setError("");
+
     } catch (error) {
+
       console.log(error);
 
-      setError("Failed to load employees");
+      setError(
+        "Failed to load employees"
+      );
+
     } finally {
+
       setLoading(false);
     }
   };
 
   // INPUT CHANGE
   const handleChange = (event) => {
+
     setFormData({
       ...formData,
       [event.target.name]:
@@ -77,56 +122,166 @@ function EmployeesPage() {
     });
   };
 
-  // ADD EMPLOYEE
-  const handleSubmit = (event) => {
+  // ADD + UPDATE
+  const handleSubmit = async (
+    event
+  ) => {
+
     event.preventDefault();
 
-    addEmployee(formData);
+    try {
+
+      if (editEmployeeId) {
+
+        await updateEmployeeApi(
+          editEmployeeId,
+          formData
+        );
+
+        addNotification(
+          `${formData.name} updated`
+        );
+
+        setSuccessMessage(
+          "Employee Updated Successfully"
+        );
+
+      } else {
+
+        await addEmployeeApi(
+          formData
+        );
+
+        addNotification(
+          `${formData.name} added`
+        );
+
+        setSuccessMessage(
+          "Employee Added Successfully"
+        );
+      }
+
+      await loadEmployees();
+
+      setFormData({
+        name: "",
+        email: "",
+        department: "",
+        city: "",
+        phone: "",
+      });
+
+      setEditEmployeeId(null);
+
+      setShowModal(false);
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+
+    } catch (error) {
+
+      console.log(error);
+
+      setError(
+        "Something went wrong"
+      );
+    }
+  };
+
+  // EDIT
+  const handleEdit = (
+    employee
+  ) => {
 
     setFormData({
-      name: "",
-      email: "",
-      department: "",
-      city: "",
-      phone: "",
+      name: employee.name,
+      email: employee.email,
+      department:
+        employee.department,
+      city: employee.city,
+      phone: employee.phone,
     });
 
-    setShowModal(false);
+    setEditEmployeeId(
+      employee.id
+    );
+
+    setShowModal(true);
+  };
+
+  // DELETE
+  const handleDelete = async () => {
+
+    try {
+
+      await deleteEmployeeApi(
+        selectedEmployee.id
+      );
+
+      addNotification(
+        `${selectedEmployee.name} deleted`
+      );
+
+      await loadEmployees();
+
+      setDeleteModal(false);
+
+      setSuccessMessage(
+        "Employee Deleted Successfully"
+      );
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+
+    } catch (error) {
+
+      console.log(error);
+
+      setError(
+        "Delete Failed"
+      );
+    }
   };
 
   // FILTER
   const filteredEmployees =
-    employees.filter((employee) => {
-      const matchesSearch =
-        employee.name
-          ?.toLowerCase()
-          .includes(
-            searchValue.toLowerCase()
-          );
+  employees.filter((employee) => {
 
-      const matchesDepartment =
-        departmentFilter === "" ||
-        (employee.company?.name ||
-          employee.department) ===
-          departmentFilter;
+    const matchesSearch =
+      (employee.name || "")
+        .toLowerCase()
+        .includes(
+          (searchValue || "")
+            .toLowerCase()
+        );
 
-      return (
-        matchesSearch &&
-        matchesDepartment
-      );
-    });
+    const matchesDepartment =
+      departmentFilter === "" ||
+      employee.department ===
+        departmentFilter;
+
+    return (
+      matchesSearch &&
+      matchesDepartment
+    );
+  });
 
   // SORT
   const sortedEmployees = [
     ...filteredEmployees,
   ].sort((a, b) => {
+
     if (sortOrder === "asc") {
+
       return a.name.localeCompare(
         b.name
       );
     }
 
     if (sortOrder === "desc") {
+
       return b.name.localeCompare(
         a.name
       );
@@ -154,6 +309,7 @@ function EmployeesPage() {
   );
 
   if (loading) {
+
     return (
       <div className="dashboard-message">
         Loading employees...
@@ -162,6 +318,7 @@ function EmployeesPage() {
   }
 
   if (error) {
+
     return (
       <div className="dashboard-message error">
         {error}
@@ -170,24 +327,55 @@ function EmployeesPage() {
   }
 
   return (
+
     <div className="employees-page">
-      {/* HEADER */}
+
       <div className="employees-header">
-        <h1>Employees</h1>
+
+        <div>
+
+          <h1>Employees</h1>
+
+          <p>
+            Manage employee details
+            easily.
+          </p>
+
+        </div>
 
         <button
           className="add-btn"
-          onClick={() =>
-            setShowModal(true)
-          }
+          onClick={() => {
+
+            setShowModal(true);
+
+            setEditEmployeeId(null);
+
+            setFormData({
+              name: "",
+              email: "",
+              department: "",
+              city: "",
+              phone: "",
+            });
+          }}
         >
-          Add Employee
+          + Add Employee
         </button>
+
       </div>
+
+      {/* SUCCESS */}
+      {successMessage && (
+
+        <div className="success-message">
+          {successMessage}
+        </div>
+      )}
 
       {/* FILTERS */}
       <div className="employee-controls">
-        {/* DEPARTMENT FILTER */}
+
         <select
           value={departmentFilter}
           onChange={(event) =>
@@ -196,6 +384,7 @@ function EmployeesPage() {
             )
           }
         >
+
           <option value="">
             All Departments
           </option>
@@ -204,21 +393,26 @@ function EmployeesPage() {
             ...new Set(
               employees.map(
                 (employee) =>
-                  employee.company?.name ||
                   employee.department
               )
             ),
-          ].map((department, index) => (
-            <option
-              key={index}
-              value={department}
-            >
-              {department}
-            </option>
-          ))}
+          ].map(
+            (
+              department,
+              index
+            ) => (
+
+              <option
+                key={index}
+                value={department}
+              >
+                {department}
+              </option>
+            )
+          )}
+
         </select>
 
-        {/* SORT */}
         <select
           value={sortOrder}
           onChange={(event) =>
@@ -227,6 +421,7 @@ function EmployeesPage() {
             )
           }
         >
+
           <option value="">
             Sort By
           </option>
@@ -238,20 +433,46 @@ function EmployeesPage() {
           <option value="desc">
             Z-A
           </option>
+
         </select>
+
       </div>
 
-      {/* ADD EMPLOYEE MODAL */}
+      {/* MODAL */}
       {showModal && (
+
         <div className="modal-overlay">
+
           <div className="employee-modal">
+
             <h2>
-              Add New Employee
+              {editEmployeeId
+                ? "Edit Employee"
+                : "Add Employee"}
             </h2>
 
             <form
-              onSubmit={handleSubmit}
+              onSubmit={(event) => {
+
+                event.preventDefault();
+
+                const confirmAction =
+                  window.confirm(
+
+                    editEmployeeId
+                      ? "Are you sure you want to update this employee?"
+                      : "Are you sure you want to add this employee?"
+                  );
+
+                if (
+                  !confirmAction
+                )
+                  return;
+
+                handleSubmit(event);
+              }}
             >
+
               <input
                 type="text"
                 name="name"
@@ -284,6 +505,7 @@ function EmployeesPage() {
                   handleChange
                 }
               >
+
                 <option value="">
                   Select Department
                 </option>
@@ -303,6 +525,7 @@ function EmployeesPage() {
                 <option>
                   Finance
                 </option>
+
               </select>
 
               <input
@@ -328,8 +551,13 @@ function EmployeesPage() {
               />
 
               <div className="modal-buttons">
+
                 <button type="submit">
-                  Add Employee
+
+                  {editEmployeeId
+                    ? "Update Employee"
+                    : "Add Employee"}
+
                 </button>
 
                 <button
@@ -343,23 +571,37 @@ function EmployeesPage() {
                 >
                   Cancel
                 </button>
+
               </div>
+
             </form>
+
           </div>
+
         </div>
       )}
 
       {/* EMPLOYEE LIST */}
       <div className="employee-list">
+
         {currentEmployees.map(
-          (employee, index) => (
+          (
+            employee,
+            index
+          ) => (
+
             <div
-              key={employee.id || index}
-              id={`employee-${employee.id}`}
+              key={
+                employee.id ||
+                index
+              }
               className="employee-card"
             >
+
               <div className="employee-top">
+
                 <div>
+
                   <h3>
                     {employee.name}
                   </h3>
@@ -367,6 +609,7 @@ function EmployeesPage() {
                   <p>
                     {employee.email}
                   </p>
+
                 </div>
 
                 <span
@@ -382,25 +625,25 @@ function EmployeesPage() {
                     ? "Active"
                     : "Inactive"}
                 </span>
+
               </div>
 
               <div className="employee-info">
+
                 <p>
                   <strong>
                     Department:
                   </strong>{" "}
-                  {employee.company?.name ||
-                    employee.department ||
-                    "N/A"}
+                  {
+                    employee.department
+                  }
                 </p>
 
                 <p>
                   <strong>
                     City:
                   </strong>{" "}
-                  {employee.address?.city ||
-                    employee.city ||
-                    "N/A"}
+                  {employee.city}
                 </p>
 
                 <p>
@@ -409,33 +652,133 @@ function EmployeesPage() {
                   </strong>{" "}
                   {employee.phone}
                 </p>
+
               </div>
+
+              <div className="employee-actions">
+
+                <button
+                  className="edit-btn"
+                  onClick={() =>
+                    handleEdit(
+                      employee
+                    )
+                  }
+                >
+                  Edit
+                </button>
+
+                <button
+                  className="delete-btn"
+                  onClick={() => {
+
+                    setSelectedEmployee(
+                      employee
+                    );
+
+                    setDeleteModal(
+                      true
+                    );
+                  }}
+                >
+                  Delete
+                </button>
+
+              </div>
+
             </div>
           )
         )}
+
       </div>
+
+      {/* DELETE MODAL */}
+      {deleteModal && (
+
+        <div className="modal-overlay">
+
+          <div className="employee-modal">
+
+            <h2>
+              Delete Employee
+            </h2>
+
+            <p>
+              Are you sure you want
+              to delete this employee?
+            </p>
+
+            <div className="modal-buttons">
+
+              <button
+                className="delete-btn"
+                onClick={
+                  handleDelete
+                }
+              >
+                Yes Delete
+              </button>
+
+              <button
+                className="cancel-btn"
+                onClick={() =>
+                  setDeleteModal(
+                    false
+                  )
+                }
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
       {/* PAGINATION */}
       <div className="pagination">
+
         <button
-          disabled={currentPage === 1}
+          disabled={
+            currentPage === 1
+          }
           onClick={() =>
             setCurrentPage(
               currentPage - 1
             )
           }
         >
-          Prev
+          ←
         </button>
 
-        <span>
-          Page {currentPage} of{" "}
-          {totalPages}
-        </span>
+        {[...Array(totalPages)].map(
+          (_, index) => (
+
+            <button
+              key={index}
+              className={
+                currentPage ===
+                index + 1
+                  ? "active-page"
+                  : ""
+              }
+              onClick={() =>
+                setCurrentPage(
+                  index + 1
+                )
+              }
+            >
+              {index + 1}
+            </button>
+          )
+        )}
 
         <button
           disabled={
-            currentPage === totalPages
+            currentPage ===
+            totalPages
           }
           onClick={() =>
             setCurrentPage(
@@ -443,9 +786,11 @@ function EmployeesPage() {
             )
           }
         >
-          Next
+          →
         </button>
+
       </div>
+
     </div>
   );
 }

@@ -4,7 +4,9 @@ import {
   useState,
 } from "react";
 
-import { fetchEmployees } from "../services/employeeService";
+import {
+  fetchEmployees,
+} from "../services/employeeService";
 
 export const EmployeeContext =
   createContext();
@@ -12,85 +14,83 @@ export const EmployeeContext =
 function EmployeeProvider({
   children,
 }) {
+
   const [employees, setEmployees] =
     useState([]);
+
+  const [notifications, setNotifications] =
+    useState([]);
+
+  const [
+    unreadCount,
+    setUnreadCount,
+  ] = useState(0);
 
   useEffect(() => {
     loadEmployees();
   }, []);
 
+  // LOAD EMPLOYEES
   const loadEmployees = async () => {
-    const data = await fetchEmployees();
 
-    setEmployees(data);
+    try {
+
+      const data =
+        await fetchEmployees();
+
+      setEmployees(data);
+
+    } catch (error) {
+
+      console.log(error);
+    }
   };
 
-  // ADD EMPLOYEE
-  const addEmployee = (
-    employeeData
+  // ADD NOTIFICATION
+  const addNotification = (
+    message
   ) => {
-    const newEmployee = {
+
+    const newNotification = {
       id: Date.now(),
-
-      ...employeeData,
-
-      company: {
-        name:
-          employeeData.department,
-      },
-
-      address: {
-        city: employeeData.city,
-      },
+      text: message,
     };
 
-    setEmployees((prev) => [
+    setNotifications((prev) => [
+      newNotification,
       ...prev,
-      newEmployee,
     ]);
-  };
 
-  // UPDATE EMPLOYEE
-  const updateEmployee = (
-    updatedEmployee
-  ) => {
-    const updatedList =
-      employees.map((employee) =>
-        employee.id ===
-        updatedEmployee.id
-          ? updatedEmployee
-          : employee
-      );
-
-    setEmployees(updatedList);
-  };
-
-  // DELETE EMPLOYEE
-  const deleteEmployee = (
-    employeeId
-  ) => {
-    const filteredEmployees =
-      employees.filter(
-        (employee) =>
-          employee.id !==
-          employeeId
-      );
-
-    setEmployees(
-      filteredEmployees
+    setUnreadCount(
+      (prev) => prev + 1
     );
   };
 
+  // CLEAR UNREAD COUNT
+  const clearNotifications =
+    () => {
+
+      setUnreadCount(0);
+    };
+
   return (
+
     <EmployeeContext.Provider
       value={{
         employees,
-        addEmployee,
-        updateEmployee,
-        deleteEmployee,
+        setEmployees,
+        loadEmployees,
+
+        notifications,
+        unreadCount,
+
+        addNotification,
+        clearNotifications,
       }}
     >
+
       {children}
+
     </EmployeeContext.Provider>
   );
 }

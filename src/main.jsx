@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import SearchProvider from "./context/SearchContext";
 import EmployeeProvider from "./context/EmployeeContext";
+import 'react-toastify/dist/ReactToastify.css';
 
 import App from "./App";
 

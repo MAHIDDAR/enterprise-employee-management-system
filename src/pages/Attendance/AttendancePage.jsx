@@ -1,35 +1,168 @@
 import { useEffect, useState } from "react";
+
 import { fetchEmployees } from "../../services/employeeService";
 
+import "./AttendancePage.css";
+
 function AttendancePage() {
-  const [attendance, setAttendance] = useState([]);
+
+  const [employees, setEmployees] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    loadAttendance();
+    loadEmployees();
   }, []);
 
-  const loadAttendance = async () => {
-    const data = await fetchEmployees();
+  const loadEmployees = async () => {
 
-    const formattedData = data.map((employee) => ({
-      ...employee,
-      status: Math.random() > 0.5 ? "Present" : "Absent",
-    }));
+    try {
 
-    setAttendance(formattedData);
+      const data =
+        await fetchEmployees();
+
+      setEmployees(data);
+
+    } catch (error) {
+
+      console.log(error);
+
+    } finally {
+
+      setLoading(false);
+
+    }
   };
 
+  if (loading) {
+
+    return (
+      <div className="attendance-page">
+        Loading Attendance...
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1>Attendance</h1>
 
-      {attendance.map((employee) => (
-        <div key={employee.id} className="attendance-card">
-          <h4>{employee.name}</h4>
+    <div className="attendance-page">
 
-          <span>{employee.status}</span>
+      <div className="attendance-header">
+
+        <div>
+
+          <h1>
+            Attendance
+          </h1>
+
+          <p>
+            Employee Attendance Status
+          </p>
+
         </div>
-      ))}
+
+        <div className="attendance-count">
+
+          Total Employees :
+          {" "}
+          {employees.length}
+
+        </div>
+
+      </div>
+
+      <div className="attendance-grid">
+
+        {employees.map(
+          (employee, index) => (
+
+            <div
+              key={employee.id || index}
+              className="attendance-card"
+            >
+
+              <div className="attendance-top">
+
+                <div>
+
+                  <h3>
+                    {employee.name}
+                  </h3>
+
+                  <p>
+                    {employee.email}
+                  </p>
+
+                </div>
+
+                <span
+                  className={
+                    employee.id % 2 === 0
+                      ? "active-status"
+                      : "inactive-status"
+                  }
+                >
+
+                  {employee.id % 2 === 0
+                    ? "Active"
+                    : "Inactive"}
+
+                </span>
+
+              </div>
+
+              <div className="attendance-info">
+
+                <p>
+
+                  <strong>
+                    Department :
+                  </strong>
+
+                  {" "}
+
+                  {employee.department ||
+                    employee.company?.name ||
+                    "N/A"}
+
+                </p>
+
+                <p>
+
+                  <strong>
+                    City :
+                  </strong>
+
+                  {" "}
+
+                  {employee.city ||
+                    employee.address?.city ||
+                    "N/A"}
+
+                </p>
+
+                <p>
+
+                  <strong>
+                    Phone :
+                  </strong>
+
+                  {" "}
+
+                  {employee.phone}
+
+                </p>
+
+              </div>
+
+            </div>
+          )
+        )}
+
+      </div>
+
     </div>
   );
 }

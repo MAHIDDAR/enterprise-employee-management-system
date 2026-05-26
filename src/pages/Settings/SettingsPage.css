@@ -2,47 +2,64 @@
   padding: 20px;
 }
 
-.settings-form {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
+.settings-header {
+  margin-bottom: 25px;
 }
 
-.settings-form input {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  width: 250px;
+.settings-header h1 {
+  font-size: 32px;
+  margin-bottom: 5px;
 }
 
-.settings-form button {
-  padding: 12px 18px;
-  border: none;
-  border-radius: 8px;
-  background-color: #0f172a;
-  color: white;
+.settings-header p {
+  color: gray;
 }
 
-.users-list {
-  margin-top: 30px;
+.settings-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
 }
 
-.user-card {
+.settings-card {
   background: white;
-  padding: 18px;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.08);
+}
 
+.settings-card h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.action-buttons {
-  display: flex;
-  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.delete-btn {
-  background: #ef4444;
-  color: white;
+.setting-item span {
+  color: #555;
+}
+
+.active-btn {
+  background: #dcfce7;
+  color: #15803d;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.inactive-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
 }

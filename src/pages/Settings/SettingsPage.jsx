@@ -1,258 +1,209 @@
-import {
-  useContext,
-  useState,
-} from "react";
-
-import { EmployeeContext } from "../../context/EmployeeContext";
-
 import "./SettingsPage.css";
 
 function SettingsPage() {
-  const {
-    employees,
-    updateEmployee,
-    deleteEmployee,
-  } = useContext(EmployeeContext);
-
-  const [formData, setFormData] =
-    useState({
-      id: "",
-      name: "",
-      email: "",
-      department: "",
-      city: "",
-      phone: "",
-    });
-
-  const [editingId, setEditingId] =
-    useState(null);
-
-  // HANDLE INPUT CHANGE
-  const handleChange = (event) => {
-    setFormData({
-      ...formData,
-      [event.target.name]:
-        event.target.value,
-    });
-  };
-
-  // EDIT EMPLOYEE
-  const handleEdit = (employee) => {
-    setEditingId(employee.id);
-
-    setFormData({
-      id: employee.id,
-
-      name: employee.name || "",
-
-      email: employee.email || "",
-
-      department:
-        employee.company?.name || "",
-
-      city:
-        employee.address?.city || "",
-
-      phone: employee.phone || "",
-    });
-  };
-
-  // UPDATE EMPLOYEE
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const updatedEmployee = {
-      id: formData.id,
-
-      name: formData.name,
-
-      email: formData.email,
-
-      phone: formData.phone,
-
-      company: {
-        name:
-          formData.department,
-      },
-
-      address: {
-        city: formData.city,
-      },
-    };
-
-    updateEmployee(
-      updatedEmployee
-    );
-
-    setEditingId(null);
-
-    setFormData({
-      id: "",
-      name: "",
-      email: "",
-      department: "",
-      city: "",
-      phone: "",
-    });
-  };
 
   return (
+
     <div className="settings-page">
+
       <div className="settings-header">
+
         <h1>
-          Employee Settings
+          Settings
         </h1>
+
+        <p>
+          Manage your application settings
+          and preferences
+        </p>
+
       </div>
 
-      {/* EDIT FORM */}
-      {editingId && (
-        <form
-          onSubmit={handleSubmit}
-          className="settings-form"
-        >
-          <input
-            type="text"
-            name="name"
-            placeholder="Employee Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+      <div className="settings-grid">
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+        {/* PROFILE CARD */}
+        <div className="settings-card">
 
-          <select
-            name="department"
-            value={
-              formData.department
-            }
-            onChange={handleChange}
-            required
-          >
-            <option value="">
-              Select Department
-            </option>
+          <h2>
+            Admin Profile
+          </h2>
 
-            <option>
-              HR
-            </option>
+          <div className="setting-item">
 
-            <option>
-              Development
-            </option>
+            <span>
+              Admin Name
+            </span>
 
-            <option>
-              Marketing
-            </option>
+            <strong>
+              Admin User
+            </strong>
 
-            <option>
-              Finance
-            </option>
-          </select>
+          </div>
 
-          <input
-            type="text"
-            name="city"
-            placeholder="City"
-            value={formData.city}
-            onChange={handleChange}
-            required
-          />
+          <div className="setting-item">
 
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
+            <span>
+              Email
+            </span>
 
-          <div className="settings-buttons">
-            <button type="submit">
-              Update Employee
+            <strong>
+              admin@gmail.com
+            </strong>
+
+          </div>
+
+          <div className="setting-item">
+
+            <span>
+              Role
+            </span>
+
+            <strong>
+              Super Admin
+            </strong>
+
+          </div>
+
+        </div>
+
+        {/* SYSTEM SETTINGS */}
+        <div className="settings-card">
+
+          <h2>
+            System Settings
+          </h2>
+
+          <div className="setting-item">
+
+            <span>
+              Employee Management
+            </span>
+
+            <button className="active-btn">
+              Active
             </button>
 
-            <button
-              type="button"
-              className="cancel-btn"
-              onClick={() => {
-                setEditingId(
-                  null
-                );
+          </div>
 
-                setFormData({
-                  id: "",
-                  name: "",
-                  email: "",
-                  department: "",
-                  city: "",
-                  phone: "",
-                });
-              }}
-            >
-              Cancel
+          <div className="setting-item">
+
+            <span>
+              Attendance Tracking
+            </span>
+
+            <button className="active-btn">
+              Enabled
             </button>
+
           </div>
-        </form>
-      )}
 
-      {/* EMPLOYEE LIST */}
-      <div className="users-list">
-        {employees.map((employee) => (
-          <div
-            key={employee.id}
-            className="user-card"
-          >
-            <div>
-              <h3>
-                {employee.name}
-              </h3>
+          <div className="setting-item">
 
-              <p>
-                {employee.email}
-              </p>
+            <span>
+              Database Status
+            </span>
 
-              <span>
-                {
-                  employee.company
-                    ?.name
-                }
-              </span>
-            </div>
+            <button className="active-btn">
+              Connected
+            </button>
 
-            <div className="action-buttons">
-              <button
-                onClick={() =>
-                  handleEdit(
-                    employee
-                  )
-                }
-              >
-                Edit
-              </button>
-
-              <button
-                className="delete-btn"
-                onClick={() =>
-                  deleteEmployee(
-                    employee.id
-                  )
-                }
-              >
-                Remove
-              </button>
-            </div>
           </div>
-        ))}
+
+        </div>
+
+        {/* SECURITY */}
+        <div className="settings-card">
+
+          <h2>
+            Security
+          </h2>
+
+          <div className="setting-item">
+
+            <span>
+              Two Factor Authentication
+            </span>
+
+            <button className="inactive-btn">
+              Disabled
+            </button>
+
+          </div>
+
+          <div className="setting-item">
+
+            <span>
+              Password Protection
+            </span>
+
+            <button className="active-btn">
+              Enabled
+            </button>
+
+          </div>
+
+          <div className="setting-item">
+
+            <span>
+              Login Alerts
+            </span>
+
+            <button className="active-btn">
+              Active
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* APPLICATION INFO */}
+        <div className="settings-card">
+
+          <h2>
+            Application Info
+          </h2>
+
+          <div className="setting-item">
+
+            <span>
+              Project Name
+            </span>
+
+            <strong>
+              Enterprise Employee
+              Management System
+            </strong>
+
+          </div>
+
+          <div className="setting-item">
+
+            <span>
+              Frontend
+            </span>
+
+            <strong>
+              React + Vite
+            </strong>
+
+          </div>
+
+          <div className="setting-item">
+
+            <span>
+              Backend
+            </span>
+
+            <strong>
+              FastAPI + SQLite
+            </strong>
+
+          </div>
+
+        </div>
+
       </div>
+
     </div>
   );
 }

@@ -11,19 +11,28 @@ import {
   FaSun,
 } from "react-icons/fa";
 
-import { ThemeContext } from "../../context/ThemeContext";
+import {
+  ThemeContext,
+} from "../../context/ThemeContext";
 
-import { SearchContext } from "../../context/SearchContext";
+import {
+  SearchContext,
+} from "../../context/SearchContext";
 
-import { fetchEmployees } from "../../services/employeeService";
+import {
+  fetchEmployees,
+} from "../../services/employeeService";
 
 import "./Navbar.css";
 
 function Navbar() {
+
   const navigate = useNavigate();
 
-  const { darkMode, toggleTheme } =
-    useContext(ThemeContext);
+  const {
+    darkMode,
+    toggleTheme,
+  } = useContext(ThemeContext);
 
   const {
     searchValue,
@@ -36,8 +45,10 @@ function Navbar() {
   const [employees, setEmployees] =
     useState([]);
 
-  const [filteredResults, setFilteredResults] =
-    useState([]);
+  const [
+    filteredResults,
+    setFilteredResults,
+  ] = useState([]);
 
   useEffect(() => {
     loadEmployees();
@@ -45,61 +56,108 @@ function Navbar() {
 
   useEffect(() => {
     handleSearch(searchValue);
-  }, [searchValue]);
+  }, [searchValue, employees]);
 
+  // LOAD EMPLOYEES
   const loadEmployees = async () => {
-    const data = await fetchEmployees();
-    setEmployees(data);
+
+    try {
+
+      const data =
+        await fetchEmployees();
+
+      setEmployees(data);
+
+    } catch (error) {
+
+      console.log(error);
+    }
   };
 
-  const handleSearch = (value) => {
+  // SEARCH
+  const handleSearch = (
+    value
+  ) => {
+
     if (!value) {
+
       setFilteredResults([]);
+
       return;
     }
 
-    const results = employees.filter(
-      (employee) =>
-        employee.name
-          .toLowerCase()
-          .includes(value.toLowerCase()) ||
-        employee.company.name
-          .toLowerCase()
-          .includes(value.toLowerCase())
-    );
+    const results =
+      employees.filter(
+        (employee) => {
+
+          const employeeName =
+            (
+              employee?.name ||
+              ""
+            ).toLowerCase();
+
+          const department =
+            (
+              employee?.company
+                ?.name ||
+              employee?.department ||
+              ""
+            ).toLowerCase();
+
+          return (
+            employeeName.includes(
+              value.toLowerCase()
+            ) ||
+            department.includes(
+              value.toLowerCase()
+            )
+          );
+        }
+      );
 
     setFilteredResults(results);
   };
 
-  const handleEmployeeClick = (
-    employeeId
-  ) => {
-    setSearchValue("");
-    setFilteredResults([]);
+  // CLICK EMPLOYEE
+  const handleEmployeeClick =
+    (employeeId) => {
 
-    navigate("/employees");
+      setSearchValue("");
 
-    setTimeout(() => {
-      const section = document.getElementById(
-        `employee-${employeeId}`
-      );
+      setFilteredResults([]);
 
-      if (section) {
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }
-    }, 300);
-  };
+      navigate("/employees");
 
+      setTimeout(() => {
+
+        const section =
+          document.getElementById(
+            `employee-${employeeId}`
+          );
+
+        if (section) {
+
+          section.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }, 300);
+    };
+
+  // LOGOUT
   const handleLogout = () => {
+
     navigate("/");
   };
 
   return (
+
     <header className="navbar">
+
+      {/* SEARCH */}
       <div className="search-wrapper">
+
         <input
           type="text"
           placeholder="Search employee or department..."
@@ -112,10 +170,14 @@ function Navbar() {
           }
         />
 
-        {filteredResults.length > 0 && (
+        {filteredResults.length >
+          0 && (
+
           <div className="search-dropdown">
+
             {filteredResults.map(
               (employee) => (
+
                 <div
                   key={employee.id}
                   className="search-item"
@@ -125,54 +187,79 @@ function Navbar() {
                     )
                   }
                 >
-                  <h4>{employee.name}</h4>
+
+                  <h4>
+                    {employee.name}
+                  </h4>
 
                   <p>
                     {
-                      employee.company
-                        .name
+                      employee?.company
+                        ?.name ||
+                      employee?.department ||
+                      "No Department"
                     }
                   </p>
+
                 </div>
               )
             )}
+
           </div>
         )}
+
       </div>
 
+      {/* RIGHT SIDE */}
       <div className="navbar-right">
+
+        {/* THEME BUTTON */}
         <button
           className="theme-btn"
           onClick={toggleTheme}
         >
+
           {darkMode ? (
             <FaSun />
           ) : (
             <FaMoon />
           )}
+
         </button>
 
+        {/* PROFILE */}
         <div className="profile-wrapper">
+
           <div
             className="profile-section"
             onClick={() =>
-              setShowMenu(!showMenu)
+              setShowMenu(
+                !showMenu
+              )
             }
           >
             Admin User
           </div>
 
           {showMenu && (
+
             <div className="dropdown-menu">
+
               <button
-                onClick={handleLogout}
+                onClick={
+                  handleLogout
+                }
               >
                 Logout
               </button>
+
             </div>
           )}
+
         </div>
+
       </div>
+
     </header>
   );
 }
