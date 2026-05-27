@@ -23,6 +23,12 @@ import "./EmployeesPage.css";
 
 function EmployeesPage() {
 
+  const role =
+    localStorage.getItem("role");
+
+  const isAdmin =
+    role === "admin";
+
   const {
     employees,
     setEmployees,
@@ -85,6 +91,7 @@ function EmployeesPage() {
     loadEmployees();
   }, []);
 
+  // LOAD EMPLOYEES
   const loadEmployees = async () => {
 
     try {
@@ -194,6 +201,8 @@ function EmployeesPage() {
     employee
   ) => {
 
+    if (!isAdmin) return;
+
     setFormData({
       name: employee.name,
       email: employee.email,
@@ -247,26 +256,26 @@ function EmployeesPage() {
 
   // FILTER
   const filteredEmployees =
-  employees.filter((employee) => {
+    employees.filter((employee) => {
 
-    const matchesSearch =
-      (employee.name || "")
-        .toLowerCase()
-        .includes(
-          (searchValue || "")
-            .toLowerCase()
-        );
+      const matchesSearch =
+        (employee.name || "")
+          .toLowerCase()
+          .includes(
+            (searchValue || "")
+              .toLowerCase()
+          );
 
-    const matchesDepartment =
-      departmentFilter === "" ||
-      employee.department ===
-        departmentFilter;
+      const matchesDepartment =
+        departmentFilter === "" ||
+        employee.department ===
+          departmentFilter;
 
-    return (
-      matchesSearch &&
-      matchesDepartment
-    );
-  });
+      return (
+        matchesSearch &&
+        matchesDepartment
+      );
+    });
 
   // SORT
   const sortedEmployees = [
@@ -330,6 +339,7 @@ function EmployeesPage() {
 
     <div className="employees-page">
 
+      {/* HEADER */}
       <div className="employees-header">
 
         <div>
@@ -345,7 +355,15 @@ function EmployeesPage() {
 
         <button
           className="add-btn"
+          disabled={!isAdmin}
+          title={
+            role !== "admin"
+              ? "Only Admin Can Perform This Action"
+              : ""
+          }
           onClick={() => {
+
+            if (!isAdmin) return;
 
             setShowModal(true);
 
@@ -365,7 +383,17 @@ function EmployeesPage() {
 
       </div>
 
-      {/* SUCCESS */}
+      {/* NORMAL USER MESSAGE */}
+      {!isAdmin && (
+
+        <div className="error-message">
+          You are logged in as Normal User.
+          Add, Edit and Delete actions
+          are disabled.
+        </div>
+      )}
+
+      {/* SUCCESS MESSAGE */}
       {successMessage && (
 
         <div className="success-message">
@@ -438,7 +466,7 @@ function EmployeesPage() {
 
       </div>
 
-      {/* MODAL */}
+      {/* ADD / EDIT MODAL */}
       {showModal && (
 
         <div className="modal-overlay">
@@ -596,6 +624,7 @@ function EmployeesPage() {
                 index
               }
               className="employee-card"
+              id={`employee-${employee.id}`}
             >
 
               <div className="employee-top">
@@ -655,10 +684,17 @@ function EmployeesPage() {
 
               </div>
 
+              {/* ACTION BUTTONS */}
               <div className="employee-actions">
 
                 <button
                   className="edit-btn"
+                  disabled={!isAdmin}
+                  title={
+                    role !== "admin"
+                      ? "Only Admin Can Perform This Action"
+                      : ""
+                  }
                   onClick={() =>
                     handleEdit(
                       employee
@@ -670,7 +706,16 @@ function EmployeesPage() {
 
                 <button
                   className="delete-btn"
+                  disabled={!isAdmin}
+                  title={
+                    role !== "admin"
+                      ? "Only Admin Can Perform This Action"
+                      : ""
+                  }
                   onClick={() => {
+
+                    if (!isAdmin)
+                      return;
 
                     setSelectedEmployee(
                       employee

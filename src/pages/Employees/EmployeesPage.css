@@ -181,3 +181,10 @@
 .cancel-btn {
   background: #ef4444;
 }
+button:disabled {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+}

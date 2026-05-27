@@ -4,7 +4,9 @@ import {
   useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import {
   FaMoon,
@@ -27,17 +29,22 @@ import "./Navbar.css";
 
 function Navbar() {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const {
     darkMode,
     toggleTheme,
-  } = useContext(ThemeContext);
+  } = useContext(
+    ThemeContext
+  );
 
   const {
     searchValue,
     setSearchValue,
-  } = useContext(SearchContext);
+  } = useContext(
+    SearchContext
+  );
 
   const [showMenu, setShowMenu] =
     useState(false);
@@ -148,6 +155,8 @@ function Navbar() {
   // LOGOUT
   const handleLogout = () => {
 
+    localStorage.clear();
+
     navigate("/");
   };
 
@@ -238,7 +247,13 @@ function Navbar() {
               )
             }
           >
-            Admin User
+            {
+              localStorage.getItem(
+                "role"
+              ) === "admin"
+                ? "Admin User"
+                : "Normal User"
+            }
           </div>
 
           {showMenu && (

@@ -69,7 +69,7 @@ def get_employees():
     return result
 
 
-# ADD EMPLOYEE
+
 @router.post("/")
 def add_employee(employee: dict):
 

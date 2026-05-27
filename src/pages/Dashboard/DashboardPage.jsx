@@ -109,8 +109,11 @@ function DashboardPage() {
           <h1>Dashboard</h1>
 
           <p>
-            Welcome back, Admin 👋
-          </p>
+  Welcome back,{" "}
+  {localStorage.getItem("role") === "admin"
+    ? "Admin 👋"
+    : "User 👋"}
+</p>
 
         </div>
 
