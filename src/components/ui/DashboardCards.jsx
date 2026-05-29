@@ -33,6 +33,10 @@ function DashboardCards({ employees }) {
       icon: <FaCalendarCheck />,
       color: "#8b5cf6",
     },
+ /*   {
+  title: "New Joinees",
+  value: "12",
+}*/
   ];
 
   return (

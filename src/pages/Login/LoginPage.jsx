@@ -26,6 +26,10 @@ function LoginPage() {
   const [error, setError] =
     useState("");
 
+  const [loading, setLoading] =
+    useState(false);
+
+  // HANDLE INPUT CHANGE
   const handleChange = (e) => {
 
     setFormData({
@@ -35,17 +39,23 @@ function LoginPage() {
     });
   };
 
+  // HANDLE LOGIN
   const handleSubmit = async (
     e
   ) => {
 
     e.preventDefault();
 
+    setError("");
+
     try {
+
+      setLoading(true);
 
       const response =
         await loginApi(formData);
 
+      // SUCCESS LOGIN
       if (
         response.message ===
         "Login Successful"
@@ -57,12 +67,19 @@ function LoginPage() {
           response.role
         );
 
-        // STORE LOGIN
+        // STORE JWT TOKEN
+        localStorage.setItem(
+          "token",
+          response.token
+        );
+
+        
         localStorage.setItem(
           "isLoggedIn",
           true
         );
 
+        
         navigate("/dashboard");
 
       } else {
@@ -79,6 +96,10 @@ function LoginPage() {
       setError(
         "Login Failed"
       );
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
@@ -95,31 +116,70 @@ function LoginPage() {
           Employee Management Login
         </h2>
 
+        <p className="login-subtitle">
+          Welcome Back 👋
+        </p>
+
+        {/* EMAIL */}
         <input
           type="email"
           name="email"
           placeholder="Enter Email"
+          value={formData.email}
           onChange={handleChange}
           required
         />
 
+        {/* PASSWORD */}
         <input
           type="password"
           name="password"
           placeholder="Enter Password"
+          value={formData.password}
           onChange={handleChange}
           required
         />
 
-        <button type="submit">
-          Login
+        {/* LOGIN BUTTON */}
+        <button
+          type="submit"
+          disabled={loading}
+        >
+
+          {loading
+            ? "Logging In..."
+            : "Login"}
+
         </button>
 
+        {/* ERROR */}
         {error && (
+
           <p className="error-text">
             {error}
           </p>
         )}
+
+        {/* DEMO CREDENTIALS */}
+        <div className="demo-credentials">
+
+          <h4>
+            Demo Credentials
+          </h4>
+
+          <p>
+            <strong>Admin:</strong>
+            admin@gmail.com /
+            admin123
+          </p>
+
+          <p>
+            <strong>User:</strong>
+            user@gmail.com /
+            user123
+          </p>
+
+        </div>
 
       </form>
 

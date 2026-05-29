@@ -1,39 +1,49 @@
 from fastapi import APIRouter
 
-auth_router = APIRouter(
-    prefix="/auth",
-    tags=["Authentication"]
-)
+from app.utils.jwt_handler import create_access_token
 
-@auth_router.post("/login")
-def login(data: dict):
+auth_router = APIRouter()
 
-    email = data["email"]
-    password = data["password"]
+# DUMMY USERS
+users = [
+    {
+        "email": "admin@gmail.com",
+        "password": "admin123",
+        "role": "admin"
+    },
+    {
+        "email": "user@gmail.com",
+        "password": "user123",
+        "role": "user"
+    }
+]
 
-    # ADMIN LOGIN
-    if (
-        email == "admin@gmail.com"
-        and
-        password == "admin123"
-    ):
+# LOGIN API
+@auth_router.post("/auth/login")
+def login(user: dict):
 
-        return {
-            "message": "Login Successful",
-            "role": "admin"
-        }
+    email = user.get("email")
 
-    # USER LOGIN
-    elif (
-        email == "user@gmail.com"
-        and
-        password == "user123"
-    ):
+    password = user.get("password")
 
-        return {
-            "message": "Login Successful",
-            "role": "user"
-        }
+    for existing_user in users:
+
+        if (
+            existing_user["email"] == email
+            and existing_user["password"] == password
+        ):
+
+            # CREATE JWT TOKEN
+            token = create_access_token({
+                "email": existing_user["email"],
+                "role": existing_user["role"]
+            })
+
+            return {
+                "message": "Login Successful",
+                "role": existing_user["role"],
+                "token": token
+            }
 
     return {
         "message": "Invalid Credentials"

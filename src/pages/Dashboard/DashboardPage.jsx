@@ -11,6 +11,7 @@ import {
 import DashboardCards from "../../components/ui/DashboardCards";
 import EmployeeChart from "../../components/ui/EmployeeChart";
 import EmployeeTable from "../../components/ui/EmployeeTable";
+import AttendanceChart from "../../components/ui/AttendanceChart";
 
 import {
   EmployeeContext,
@@ -193,6 +194,7 @@ function DashboardPage() {
         <EmployeeChart employees={employees} />
 
         <EmployeeTable employees={employees} />
+        <AttendanceChart />
 
       </div>
 
