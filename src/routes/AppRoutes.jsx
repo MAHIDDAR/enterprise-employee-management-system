@@ -5,11 +5,15 @@ import {
 } from "react-router-dom";
 
 import LoginPage from "../pages/Login/LoginPage";
+import ForgotPasswordPage from "../pages/ForgotPassword/ForgotPassword";
+
 import DashboardPage from "../pages/Dashboard/DashboardPage";
 import EmployeesPage from "../pages/Employees/EmployeesPage";
 import DepartmentsPage from "../pages/Departments/DepartmentsPage";
 import AttendancePage from "../pages/Attendance/AttendancePage";
 import SettingsPage from "../pages/Settings/SettingsPage";
+import SignupPage from "../pages/SignupPage/SignupPage";
+
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -28,13 +32,23 @@ function AppRoutes() {
           path="/"
           element={<LoginPage />}
         />
+            <Route
+path="/signup"
+element={<SignupPage />}
+/>  
 
-        {/* PROTECTED ROUTES */}
+        {/* FORGOT PASSWORD */}
+        <Route
+          path="/forgot-password"
+          element={<ForgotPasswordPage />}
+        />
+
+        {/* PROTECTED */}
         <Route
           element={<ProtectedRoute />}
         >
+       
 
-          {/* DASHBOARD LAYOUT */}
           <Route
             element={<DashboardLayout />}
           >

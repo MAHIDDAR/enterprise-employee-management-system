@@ -1,170 +1,215 @@
-import { useEffect, useState } from "react";
+import {
+useEffect,
+useState
+}
+from "react";
 
-import { fetchEmployees } from "../../services/employeeService";
+import {
+fetchEmployees
+}
+from "../../services/employeeService";
 
 import "./AttendancePage.css";
 
-function AttendancePage() {
+function AttendancePage(){
 
-  const [employees, setEmployees] =
-    useState([]);
+const role=
+localStorage.getItem(
+"role"
+);
 
-  const [loading, setLoading] =
-    useState(true);
+const [
+employees,
+setEmployees
+]=useState([]);
 
-  useEffect(() => {
-    loadEmployees();
-  }, []);
+const [
+loading,
+setLoading
+]=useState(true);
 
-  const loadEmployees = async () => {
+useEffect(()=>{
 
-    try {
+loadEmployees();
 
-      const data =
-        await fetchEmployees();
+},[]);
 
-      setEmployees(data);
+const loadEmployees=
+async()=>{
 
-    } catch (error) {
+const data=
+await fetchEmployees();
 
-      console.log(error);
+setEmployees(data);
 
-    } finally {
+setLoading(false);
 
-      setLoading(false);
+};
 
-    }
-  };
+const downloadCSV=()=>{
 
-  if (loading) {
+const rows=[
 
-    return (
-      <div className="attendance-page">
-        Loading Attendance...
-      </div>
-    );
-  }
+["Name","Email","Department"],
 
-  return (
+...employees.map(
 
-    <div className="attendance-page">
+e=>[
 
-      <div className="attendance-header">
+e.name,
 
-        <div>
+e.email,
 
-          <h1>
-            Attendance
-          </h1>
+e.department
 
-          <p>
-            Employee Attendance Status
-          </p>
+]
 
-        </div>
+)
 
-        <div className="attendance-count">
+];
 
-          Total Employees :
-          {" "}
-          {employees.length}
+const csv=
 
-        </div>
+rows.map(
 
-      </div>
+row=>row.join(",")
 
-      <div className="attendance-grid">
+).join("\n");
 
-        {employees.map(
-          (employee, index) => (
+const blob=
+new Blob(
 
-            <div
-              key={employee.id || index}
-              className="attendance-card"
-            >
+[csv],
 
-              <div className="attendance-top">
+{
 
-                <div>
+type:"text/csv"
 
-                  <h3>
-                    {employee.name}
-                  </h3>
+}
 
-                  <p>
-                    {employee.email}
-                  </p>
+);
 
-                </div>
+const url=
+URL.createObjectURL(
+blob
+);
 
-                <span
-                  className={
-                    employee.id % 2 === 0
-                      ? "active-status"
-                      : "inactive-status"
-                  }
-                >
+const a=
+document.createElement(
+"a"
+);
 
-                  {employee.id % 2 === 0
-                    ? "Active"
-                    : "Inactive"}
+a.href=url;
 
-                </span>
+a.download=
+"attendance.csv";
 
-              </div>
+a.click();
 
-              <div className="attendance-info">
+};
 
-                <p>
+if(loading){
 
-                  <strong>
-                    Department :
-                  </strong>
+return <div>
 
-                  {" "}
+Loading...
 
-                  {employee.department ||
-                    employee.company?.name ||
-                    "N/A"}
+</div>
 
-                </p>
+}
 
-                <p>
+return(
 
-                  <strong>
-                    City :
-                  </strong>
+<div className=
+"attendance-page"
+>
 
-                  {" "}
+<div className=
+"attendance-header"
+>
 
-                  {employee.city ||
-                    employee.address?.city ||
-                    "N/A"}
+<h1>
 
-                </p>
+Attendance
 
-                <p>
+</h1>
 
-                  <strong>
-                    Phone :
-                  </strong>
+{
 
-                  {" "}
+role==="admin"
 
-                  {employee.phone}
+&&
 
-                </p>
+<button
 
-              </div>
+className=
+"download-btn"
 
-            </div>
-          )
-        )}
+onClick={
+downloadCSV
+}
 
-      </div>
+>
 
-    </div>
-  );
+Download Report
+
+</button>
+
+}
+
+</div>
+
+<div className=
+"attendance-grid"
+>
+
+{
+
+employees.map(
+
+(emp)=>(
+
+<div
+
+key={emp.id}
+
+className=
+"attendance-card"
+
+>
+
+<h3>
+
+{emp.name}
+
+</h3>
+
+<p>
+
+{emp.email}
+
+</p>
+
+<p>
+
+{emp.department}
+
+</p>
+
+</div>
+
+)
+
+)
+
+}
+
+</div>
+
+</div>
+
+);
+
 }
 
 export default AttendancePage;

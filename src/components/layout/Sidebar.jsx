@@ -15,7 +15,10 @@ function Sidebar() {
   const role =
     localStorage.getItem("role");
 
+  // COMMON FOR BOTH USER + ADMIN
+
   const menuItems = [
+
     {
       name: "Dashboard",
       path: "/dashboard",
@@ -34,21 +37,28 @@ function Sidebar() {
       icon: <FaBuilding />,
     },
 
-    {
-      name: "Attendance",
-      path: "/attendance",
-      icon: <FaCalendarCheck />,
-    },
   ];
 
   // ADMIN ONLY
+
   if (role === "admin") {
 
-    menuItems.push({
-      name: "Settings",
-      path: "/settings",
-      icon: <FaCog />,
-    });
+    menuItems.push(
+
+      {
+        name: "Attendance",
+        path: "/attendance",
+        icon: <FaCalendarCheck />,
+      },
+
+      {
+        name: "Settings",
+        path: "/settings",
+        icon: <FaCog />,
+      }
+
+    );
+
   }
 
   return (
@@ -56,7 +66,9 @@ function Sidebar() {
     <aside className="sidebar">
 
       <div className="logo">
+
         <h2>EEMS</h2>
+
       </div>
 
       <nav className="sidebar-nav">
@@ -64,26 +76,37 @@ function Sidebar() {
         {menuItems.map((item) => (
 
           <NavLink
+
             key={item.name}
+
             to={item.path}
+
             className="nav-item"
+
           >
 
             <span>
+
               {item.icon}
+
             </span>
 
             <span>
+
               {item.name}
+
             </span>
 
           </NavLink>
+
         ))}
 
       </nav>
 
     </aside>
+
   );
+
 }
 
 export default Sidebar;

@@ -580,13 +580,47 @@ function EmployeesPage() {
 
               <div className="modal-buttons">
 
-                <button type="submit">
+               <button
 
-                  {editEmployeeId
-                    ? "Update Employee"
-                    : "Add Employee"}
+type="submit"
 
-                </button>
+disabled={
+
+!formData.name.trim()
+
+||
+
+!formData.email.trim()
+
+||
+
+!formData.department
+||
+
+!formData.city.trim()
+||
+
+!formData.phone.trim()
+
+}
+
+>
+
+{
+
+editEmployeeId
+
+?
+
+"Update Employee"
+
+:
+
+"Add Employee"
+
+}
+
+</button>
 
                 <button
                   type="button"

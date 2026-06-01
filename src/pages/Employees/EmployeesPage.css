@@ -188,3 +188,20 @@ button:disabled {
   cursor: not-allowed;
 
 }
+.validation{
+
+color:red;
+
+font-size:13px;
+
+margin-bottom:10px;
+
+}
+
+.employee-modal button:disabled{
+
+opacity:.5;
+
+cursor:not-allowed;
+
+}

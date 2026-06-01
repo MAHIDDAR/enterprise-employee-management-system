@@ -1,0 +1,62 @@
+.signup-page{
+
+height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:#f4f6fb;
+
+}
+
+.signup-form{
+
+width:380px;
+
+background:white;
+
+padding:30px;
+
+border-radius:12px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:15px;
+
+box-shadow:
+
+0 5px 20px
+
+rgba(0,0,0,.1);
+
+}
+
+.signup-form input,
+.signup-form select{
+
+padding:12px;
+
+border:1px solid #ccc;
+
+border-radius:8px;
+
+}
+
+.signup-form button{
+
+padding:12px;
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+}

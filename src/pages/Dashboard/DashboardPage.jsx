@@ -41,6 +41,18 @@ function DashboardPage() {
     clearNotifications,
   } = useContext(EmployeeContext);
 
+  // ADDED DYNAMIC DATE
+  const currentDate =
+    new Date().toLocaleDateString(
+      "en-IN",
+      {
+        weekday:"long",
+        year:"numeric",
+        month:"long",
+        day:"numeric"
+      }
+    );
+
   useEffect(() => {
     loadEmployees();
   }, []);
@@ -110,11 +122,11 @@ function DashboardPage() {
           <h1>Dashboard</h1>
 
           <p>
-  Welcome back,{" "}
-  {localStorage.getItem("role") === "admin"
-    ? "Admin 👋"
-    : "User 👋"}
-</p>
+            Welcome back,{" "}
+            {localStorage.getItem("role") === "admin"
+              ? "Admin 👋"
+              : "User 👋"}
+          </p>
 
         </div>
 
@@ -179,8 +191,9 @@ function DashboardPage() {
 
           </div>
 
+          {/* UPDATED DATE BUTTON */}
           <button className="date-btn">
-            May 26, 2026
+            {currentDate}
           </button>
 
         </div>
@@ -194,6 +207,7 @@ function DashboardPage() {
         <EmployeeChart employees={employees} />
 
         <EmployeeTable employees={employees} />
+
         <AttendanceChart />
 
       </div>

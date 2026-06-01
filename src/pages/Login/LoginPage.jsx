@@ -1,190 +1,375 @@
 import {
-  useState
+useState
 } from "react";
 
 import {
-  useNavigate
+useNavigate
 } from "react-router-dom";
 
 import {
-  loginApi
+FaEye,
+FaEyeSlash
+} from "react-icons/fa";
+
+import {
+loginApi
 } from "../../services/authService";
 
 import "./LoginPage.css";
 
-function LoginPage() {
+function LoginPage(){
 
-  const navigate =
-    useNavigate();
+const navigate=
+useNavigate();
 
-  const [formData, setFormData] =
-    useState({
-      email: "",
-      password: "",
-    });
+const[
+showPassword,
+setShowPassword
+]=useState(true);
 
-  const [error, setError] =
-    useState("");
+const[
+formData,
+setFormData
+]=useState({
 
-  const [loading, setLoading] =
-    useState(false);
+email:"",
 
-  // HANDLE INPUT CHANGE
-  const handleChange = (e) => {
+password:"",
 
-    setFormData({
-      ...formData,
-      [e.target.name]:
-        e.target.value,
-    });
-  };
+role:""
 
-  // HANDLE LOGIN
-  const handleSubmit = async (
-    e
-  ) => {
+});
 
-    e.preventDefault();
+const[
+error,
+setError
+]=useState("");
 
-    setError("");
+const[
+loading,
+setLoading
+]=useState(false);
 
-    try {
+const handleChange=(e)=>{
 
-      setLoading(true);
+setFormData({
 
-      const response =
-        await loginApi(formData);
+...formData,
 
-      // SUCCESS LOGIN
-      if (
-        response.message ===
-        "Login Successful"
-      ) {
+[e.target.name]:
+e.target.value
 
-        // STORE ROLE
-        localStorage.setItem(
-          "role",
-          response.role
-        );
+});
 
-        // STORE JWT TOKEN
-        localStorage.setItem(
-          "token",
-          response.token
-        );
+};
 
-        
-        localStorage.setItem(
-          "isLoggedIn",
-          true
-        );
+const handleSubmit=
+async(e)=>{
 
-        
-        navigate("/dashboard");
+e.preventDefault();
 
-      } else {
+setError("");
 
-        setError(
-          "Invalid Credentials"
-        );
-      }
+try{
 
-    } catch (error) {
+setLoading(true);
 
-      console.log(error);
+const response=
+await loginApi(
+formData
+);
 
-      setError(
-        "Login Failed"
-      );
+if(
 
-    } finally {
+response.message===
+"Login Successful"
 
-      setLoading(false);
-    }
-  };
+){
 
-  return (
+localStorage.setItem(
 
-    <div className="login-page">
+"role",
 
-      <form
-        className="login-form"
-        onSubmit={handleSubmit}
-      >
+response.role
 
-        <h2>
-          Employee Management Login
-        </h2>
+);
 
-        <p className="login-subtitle">
-          Welcome Back 👋
-        </p>
+localStorage.setItem(
 
-        {/* EMAIL */}
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+"token",
 
-        {/* PASSWORD */}
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+response.token
 
-        {/* LOGIN BUTTON */}
-        <button
-          type="submit"
-          disabled={loading}
-        >
+);
 
-          {loading
-            ? "Logging In..."
-            : "Login"}
+localStorage.setItem(
 
-        </button>
+"isLoggedIn",
 
-        {/* ERROR */}
-        {error && (
+true
 
-          <p className="error-text">
-            {error}
-          </p>
-        )}
+);
 
-        {/* DEMO CREDENTIALS */}
-        <div className="demo-credentials">
+navigate(
+"/dashboard"
+);
 
-          <h4>
-            Demo Credentials
-          </h4>
+}
 
-          <p>
-            <strong>Admin:</strong>
-            admin@gmail.com /
-            admin123
-          </p>
+else{
 
-          <p>
-            <strong>User:</strong>
-            user@gmail.com /
-            user123
-          </p>
+setError(
+"Invalid Credentials"
+);
 
-        </div>
+}
 
-      </form>
+}
 
-    </div>
-  );
+catch{
+
+setError(
+"Login Failed"
+);
+
+}
+
+finally{
+
+setLoading(false);
+
+}
+
+};
+
+return(
+
+<div className="login-page">
+
+<form
+
+className="login-form"
+
+onSubmit={
+handleSubmit
+}
+
+>
+
+<h2>
+
+Employee Management Login
+
+</h2>
+
+<select
+
+name="role"
+
+value={
+formData.role
+}
+
+onChange={
+handleChange
+}
+
+required
+
+>
+
+<option value="">
+
+Select Role
+
+</option>
+
+<option value="admin">
+
+Admin
+
+</option>
+
+<option value="user">
+
+User
+
+</option>
+
+</select>
+
+<input
+
+type="email"
+
+name="email"
+
+placeholder="Enter Email"
+
+value={
+formData.email
+}
+
+onChange={
+handleChange
+}
+
+required
+
+/>
+
+<div className="password-wrapper">
+
+<input
+
+type={
+
+showPassword
+
+?
+
+"password"
+
+:
+
+"text"
+
+}
+
+name="password"
+
+placeholder="Enter Password"
+
+value={formData.password}
+
+onChange={handleChange}
+
+required
+
+/>
+
+<span
+
+className="eye-icon"
+
+onClick={()=>{
+
+setShowPassword(
+
+!showPassword
+
+)
+
+}}
+
+>
+
+{
+
+showPassword
+
+?
+
+<FaEyeSlash/>
+
+:
+
+<FaEye/>
+
+}
+
+</span>
+
+</div>
+
+<button
+
+type="submit"
+
+disabled={loading}
+
+>
+
+{
+
+loading
+
+?
+
+"Logging In..."
+
+:
+
+"Login"
+
+}
+
+</button>
+
+<div className="auth-links">
+
+<button
+
+type="button"
+
+className="secondary-btn"
+
+onClick={()=>{
+
+navigate(
+"/forgot-password"
+)
+
+}}
+
+>
+
+Forgot Password?
+
+</button>
+
+<button
+
+type="button"
+
+className="secondary-btn"
+
+onClick={()=>{
+
+navigate(
+"/signup"
+)
+
+}}
+
+>
+
+Sign Up
+
+</button>
+
+</div>
+
+{
+
+error && (
+
+<p className="error-text">
+
+{error}
+
+</p>
+
+)
+
+}
+
+</form>
+
+</div>
+
+);
+
 }
 
 export default LoginPage;
