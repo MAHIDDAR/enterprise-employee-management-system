@@ -1,211 +1,602 @@
+import {
+useState,
+useEffect
+} from "react";
+
+import {
+
+sendRoleRequestApi,
+getPendingRequestsApi,
+approveRequestApi,
+rejectRequestApi
+
+}
+
+from "../../services/authService";
+
 import "./SettingsPage.css";
 
-function SettingsPage() {
+function SettingsPage(){
 
-  return (
+const role=
+localStorage.getItem("role");
 
-    <div className="settings-page">
+const email=
+localStorage.getItem("email");
 
-      <div className="settings-header">
+const [darkMode,setDarkMode]=
+useState(
 
-        <h1>
-          Settings
-        </h1>
+localStorage.getItem("theme")==="dark"
 
-        <p>
-          Manage your application settings
-          and preferences
-        </p>
+);
 
-      </div>
+const [formData,setFormData]=
+useState({
 
-      <div className="settings-grid">
+password:"",
 
-        {/* PROFILE CARD */}
-        <div className="settings-card">
+adminEmail:""
 
-          <h2>
-            Admin Profile
-          </h2>
+});
 
-          <div className="setting-item">
+const [message,setMessage]=
+useState("");
 
-            <span>
-              Admin Name
-            </span>
+const [requests,setRequests]=
+useState([]);
 
-            <strong>
-              Admin User
-            </strong>
+useEffect(()=>{
 
-          </div>
+if(role==="admin"){
 
-          <div className="setting-item">
+loadRequests();
 
-            <span>
-              Email
-            </span>
+}
 
-            <strong>
-              admin@gmail.com
-            </strong>
+},[role]);
 
-          </div>
+useEffect(()=>{
 
-          <div className="setting-item">
+if(darkMode){
 
-            <span>
-              Role
-            </span>
+document.body.classList.add(
 
-            <strong>
-              Super Admin
-            </strong>
+"dark-theme"
 
-          </div>
+);
 
-        </div>
+localStorage.setItem(
 
-        {/* SYSTEM SETTINGS */}
-        <div className="settings-card">
+"theme",
 
-          <h2>
-            System Settings
-          </h2>
+"dark"
 
-          <div className="setting-item">
+);
 
-            <span>
-              Employee Management
-            </span>
+}
 
-            <button className="active-btn">
-              Active
-            </button>
+else{
 
-          </div>
+document.body.classList.remove(
 
-          <div className="setting-item">
+"dark-theme"
 
-            <span>
-              Attendance Tracking
-            </span>
+);
 
-            <button className="active-btn">
-              Enabled
-            </button>
+localStorage.setItem(
 
-          </div>
+"theme",
 
-          <div className="setting-item">
+"light"
 
-            <span>
-              Database Status
-            </span>
+);
 
-            <button className="active-btn">
-              Connected
-            </button>
+}
 
-          </div>
+},[darkMode]);
 
-        </div>
+const loadRequests=
+async()=>{
 
-        {/* SECURITY */}
-        <div className="settings-card">
+try{
 
-          <h2>
-            Security
-          </h2>
+const data=
 
-          <div className="setting-item">
+await getPendingRequestsApi();
 
-            <span>
-              Two Factor Authentication
-            </span>
+setRequests(data);
 
-            <button className="inactive-btn">
-              Disabled
-            </button>
+}
 
-          </div>
+catch(error){
 
-          <div className="setting-item">
+console.log(error);
 
-            <span>
-              Password Protection
-            </span>
+}
 
-            <button className="active-btn">
-              Enabled
-            </button>
+};
 
-          </div>
+const handleChange=
+(event)=>{
 
-          <div className="setting-item">
+setFormData({
 
-            <span>
-              Login Alerts
-            </span>
+...formData,
 
-            <button className="active-btn">
-              Active
-            </button>
+[event.target.name]:
 
-          </div>
+event.target.value
 
-        </div>
+});
 
-        {/* APPLICATION INFO */}
-        <div className="settings-card">
+};
 
-          <h2>
-            Application Info
-          </h2>
+const submitRequest=
+async()=>{
 
-          <div className="setting-item">
+try{
 
-            <span>
-              Project Name
-            </span>
+const response=
 
-            <strong>
-              Enterprise Employee
-              Management System
-            </strong>
+await sendRoleRequestApi({
 
-          </div>
+name:
 
-          <div className="setting-item">
+localStorage.getItem(
 
-            <span>
-              Frontend
-            </span>
+"email"
 
-            <strong>
-              React + Vite
-            </strong>
+),
 
-          </div>
+email:
 
-          <div className="setting-item">
+localStorage.getItem(
 
-            <span>
-              Backend
-            </span>
+"email"
 
-            <strong>
-              FastAPI + SQLite
-            </strong>
+),
 
-          </div>
+password:
 
-        </div>
+formData.password,
 
-      </div>
+adminEmail:
 
-    </div>
-  );
+formData.adminEmail
+
+});
+
+setMessage(
+
+response.message
+
+);
+
+setFormData({
+
+password:"",
+
+adminEmail:""
+
+});
+
+}
+
+catch(error){
+
+console.log(error);
+
+setMessage(
+
+"Request Failed"
+
+);
+
+}
+
+};
+
+const approve=
+async(id)=>{
+
+try{
+
+await approveRequestApi(id);
+
+loadRequests();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const reject=
+async(id)=>{
+
+try{
+
+await rejectRequestApi(id);
+
+loadRequests();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+return(
+
+<div className="settings-page">
+
+<div className="settings-header">
+
+<h1>
+
+Settings
+
+</h1>
+
+<p>
+
+Manage appearance, notifications and preferences
+
+</p>
+
+</div>
+
+<div className="settings-grid">
+
+{/* APPEARANCE */}
+
+<div className="settings-card">
+
+<h2>
+
+🌙 Appearance
+
+</h2>
+
+<p>
+
+Switch between themes
+
+</p>
+
+<label>
+
+<input
+
+type="checkbox"
+
+checked={darkMode}
+
+onChange={()=>{
+
+setDarkMode(
+
+!darkMode
+
+)
+
+}}
+
+/>
+
+Dark Theme
+
+</label>
+
+</div>
+
+{/* NOTIFICATIONS */}
+
+<div className="settings-card">
+
+<h2>
+
+🔔 Notifications
+
+</h2>
+
+<label>
+
+<input
+
+type="checkbox"
+
+defaultChecked
+
+/>
+
+Employee Alerts
+
+</label>
+
+<label>
+
+<input
+
+type="checkbox"
+
+defaultChecked
+
+/>
+
+Attendance Alerts
+
+</label>
+
+<label>
+
+<input
+
+type="checkbox"
+
+/>
+
+Email Notifications
+
+</label>
+
+</div>
+
+{/* ACCOUNT */}
+
+<div className="settings-card">
+
+<h2>
+
+👤 Account
+
+</h2>
+
+<p>
+
+<strong>
+
+Email:
+
+</strong>
+
+{" "}
+
+{email}
+
+</p>
+
+<p>
+
+<strong>
+
+Role:
+
+</strong>
+
+{" "}
+
+{role}
+
+</p>
+
+</div>
+
+{/* USER */}
+
+{
+
+role==="user"
+
+&&
+
+<div className="settings-card">
+
+<h2>
+
+Request Admin Role
+
+</h2>
+
+<input
+
+type="password"
+
+name="password"
+
+placeholder="Current Password"
+
+value={formData.password}
+
+onChange={handleChange}
+
+/>
+
+<input
+
+name="adminEmail"
+
+placeholder="Admin Email"
+
+value={formData.adminEmail}
+
+onChange={handleChange}
+
+/>
+
+<button
+
+className="request-btn"
+
+onClick={submitRequest}
+
+>
+
+Send Request
+
+</button>
+
+{
+
+message &&
+
+<p>
+
+{message}
+
+</p>
+
+}
+
+</div>
+
+}
+
+{/* ADMIN */}
+
+{
+
+role==="admin"
+
+&&
+
+<div className="settings-card">
+
+<h2>
+
+Pending Requests
+
+</h2>
+
+{
+
+requests.length===0
+
+?
+
+<p>
+
+No Requests
+
+</p>
+
+:
+
+requests.map(
+
+(request)=>(
+
+<div
+
+key={request.id}
+
+className="request-card"
+
+>
+
+<div>
+
+<p>
+
+<strong>
+
+User:
+
+</strong>
+
+{" "}
+
+{request.name}
+
+</p>
+
+<p>
+
+<strong>
+
+Email:
+
+</strong>
+
+{" "}
+
+{request.email}
+
+</p>
+
+</div>
+
+<div>
+
+<button
+
+className="approve-btn"
+
+onClick={()=>{
+
+approve(
+
+request.id
+
+)
+
+}}
+
+>
+
+Approve
+
+</button>
+
+<button
+
+className="reject-btn"
+
+onClick={()=>{
+
+reject(
+
+request.id
+
+)
+
+}}
+
+>
+
+Reject
+
+</button>
+
+</div>
+
+</div>
+
+)
+
+)
+
+}
+
+</div>
+
+}
+
+</div>
+
+</div>
+
+)
+
 }
 
 export default SettingsPage;

@@ -109,6 +109,13 @@ localStorage.setItem(
 true
 
 );
+localStorage.setItem(
+
+"email",
+
+formData.email
+
+);
 
 navigate(
 "/dashboard"

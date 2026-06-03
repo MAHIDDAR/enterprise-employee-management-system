@@ -15,49 +15,54 @@ function Sidebar() {
   const role =
     localStorage.getItem("role");
 
-  // COMMON FOR BOTH USER + ADMIN
-
   const menuItems = [
 
     {
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: <FaHome />,
+      name:"Dashboard",
+      path:"/dashboard",
+      icon:<FaHome/>
     },
 
     {
-      name: "Employees",
-      path: "/employees",
-      icon: <FaUsers />,
+      name:"Employees",
+      path:"/employees",
+      icon:<FaUsers/>
     },
 
     {
-      name: "Departments",
-      path: "/departments",
-      icon: <FaBuilding />,
-    },
+      name:"Departments",
+      path:"/departments",
+      icon:<FaBuilding/>
+    }
 
   ];
 
-  // ADMIN ONLY
+  
 
-  if (role === "admin") {
+  // ADMIN ONLY ATTENDANCE
 
-    menuItems.push(
+  if(role==="admin"){
 
-      {
-        name: "Attendance",
-        path: "/attendance",
-        icon: <FaCalendarCheck />,
-      },
+    menuItems.push({
 
-      {
-        name: "Settings",
-        path: "/settings",
-        icon: <FaCog />,
-      }
+      name:"Attendance",
 
-    );
+      path:"/attendance",
+
+      icon:<FaCalendarCheck/>
+
+    });
+    // USER + ADMIN SETTINGS
+
+  menuItems.push({
+
+    name:"Settings",
+
+    path:"/settings",
+
+    icon:<FaCog/>
+
+  });
 
   }
 
@@ -73,33 +78,33 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
 
-        {menuItems.map((item) => (
+        {
 
-          <NavLink
+          menuItems.map((item)=>(
 
-            key={item.name}
+            <NavLink
 
-            to={item.path}
+              key={item.name}
 
-            className="nav-item"
+              to={item.path}
 
-          >
+              className="nav-item"
 
-            <span>
+            >
 
-              {item.icon}
+              <span>
+                {item.icon}
+              </span>
 
-            </span>
+              <span>
+                {item.name}
+              </span>
 
-            <span>
+            </NavLink>
 
-              {item.name}
+          ))
 
-            </span>
-
-          </NavLink>
-
-        ))}
+        }
 
       </nav>
 

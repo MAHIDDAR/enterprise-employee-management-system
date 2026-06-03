@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-
 from app.utils.jwt_handler import create_access_token
 
 auth_router = APIRouter()
@@ -20,137 +19,105 @@ users = [
 
 ]
 
-
 # SIGNUP
 
 @auth_router.post("/auth/signup")
+def signup(user: dict):
 
-def signup(user:dict):
+    email = user.get("email")
+    password = user.get("password")
+    role = user.get("role")
+    name = user.get("name")
 
-    email=user.get("email")
-
-    password=user.get("password")
-
-    role=user.get("role")
-
-    name=user.get("name")
-
-
-    # CHECK EXISTING
+    # CHECK EXISTING USER
 
     for existing_user in users:
 
-        if existing_user["email"]==email:
+        if existing_user["email"].lower() == email.lower():
 
             return {
-
                 "message":"User Already Exists"
-
             }
-
 
     # ADMIN RESTRICTION
 
-    if role=="admin":
+    if role == "admin":
 
-        allowed_admin="mahiddar@gmail.com"
+        allowed_admin = "mahiddar@gmail.com"
 
-        if email.lower()!=allowed_admin:
+        if email.lower() != allowed_admin.lower():
 
             return {
-
-                "message":
-
-                "Only Mahiddar Is Admin"
-
+                "message":"Only Mahiddar Can Create Admin Account"
             }
-
 
     users.append({
 
         "name":name,
-
         "email":email,
-
         "password":password,
-
         "role":role
 
     })
 
     return {
 
-        "message":
-
-        "Signup Successful"
+        "message":"Signup Successful"
 
     }
-
 
 
 # LOGIN
 
 @auth_router.post("/auth/login")
+def login(user: dict):
 
-def login(user:dict):
-
-    email=user.get("email")
-
-    password=user.get("password")
-
-    role=user.get("role")
+    email = user.get("email")
+    password = user.get("password")
+    role = user.get("role")
 
     for existing_user in users:
 
-        if(
+        if (
 
             existing_user["email"].lower()
-
             ==
-
             email.lower()
 
             and
 
             existing_user["password"]
-
             ==
-
             password
 
             and
 
             existing_user["role"]
-
             ==
-
             role
 
         ):
 
-            token=create_access_token(
+            token = create_access_token(
 
                 data={
 
                     "email":email,
-
                     "role":role
 
                 }
 
             )
 
-            return{
+            return {
 
                 "message":"Login Successful",
-
                 "role":existing_user["role"],
-
                 "token":token
 
             }
 
-    return{
+    return {
 
         "message":"Invalid Credentials"
 
@@ -160,28 +127,24 @@ def login(user:dict):
 # FORGOT PASSWORD
 
 @auth_router.post("/auth/forgot-password")
+def forgot_password(user: dict):
 
-def forgot_password(user:dict):
-
-    email=user.get("email")
-
-    new_password=user.get("password")
+    email = user.get("email")
+    new_password = user.get("password")
 
     for existing_user in users:
 
-        if existing_user["email"]==email:
+        if existing_user["email"].lower() == email.lower():
 
-            existing_user["password"]=new_password
+            existing_user["password"] = new_password
 
-            return{
+            return {
 
-                "message":
-
-                "Password Updated Successfully"
+                "message":"Password Updated Successfully"
 
             }
 
-    return{
+    return {
 
         "message":"User Not Found"
 
