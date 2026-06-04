@@ -8,35 +8,57 @@ import {
 import "./DashboardCards.css";
 
 function DashboardCards({ employees }) {
+
+  const totalEmployees =
+    employees.length;
+
+  const activeEmployees =
+    employees.filter(
+      (employee) =>
+        (employee.status || "Active") === "Active"
+    ).length;
+
+  const totalDepartments =
+    [
+      ...new Set(
+        employees
+          .map((employee) => employee.department)
+          .filter(Boolean)
+      ),
+    ].length;
+
+  const attendancePercentage =
+    totalEmployees === 0
+      ? 0
+      : Math.round(
+          (activeEmployees / totalEmployees) * 100
+        );
+
   const cards = [
     {
       title: "Total Employees",
-      value: employees.length,
+      value: totalEmployees,
       icon: <FaUsers />,
       color: "#2563eb",
     },
     {
       title: "Active Employees",
-      value: employees.length - 2,
+      value: activeEmployees,
       icon: <FaUserCheck />,
       color: "#10b981",
     },
     {
       title: "Departments",
-      value: 5,
+      value: totalDepartments,
       icon: <FaBuilding />,
       color: "#f59e0b",
     },
     {
       title: "Attendance",
-      value: "92%",
+      value: `${attendancePercentage}%`,
       icon: <FaCalendarCheck />,
       color: "#8b5cf6",
     },
- /*   {
-  title: "New Joinees",
-  value: "12",
-}*/
   ];
 
   return (

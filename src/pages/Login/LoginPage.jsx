@@ -36,7 +36,9 @@ email:"",
 
 password:"",
 
-role:""
+role:"",
+
+company:""
 
 });
 
@@ -96,6 +98,14 @@ response.role
 
 localStorage.setItem(
 
+"company",
+
+response.company
+
+);
+
+localStorage.setItem(
+
 "token",
 
 response.token
@@ -109,6 +119,7 @@ localStorage.setItem(
 true
 
 );
+
 localStorage.setItem(
 
 "email",
@@ -168,6 +179,46 @@ handleSubmit
 Employee Management Login
 
 </h2>
+
+{/* COMPANY */}
+
+<select
+
+name="company"
+
+value={
+formData.company
+}
+
+onChange={
+handleChange
+}
+
+required
+
+>
+
+<option value="">
+
+Select Company
+
+</option>
+
+<option value="Stackly">
+
+Stackly
+
+</option>
+
+<option value="TCS">
+
+TCS
+
+</option>
+
+</select>
+
+{/* ROLE */}
 
 <select
 

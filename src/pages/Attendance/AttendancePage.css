@@ -107,3 +107,33 @@ font-weight:600;
 opacity:.9;
 
 }
+/* ATTENDANCE DARK MODE */
+
+body.dark-theme .attendance-page {
+  background: #111827 !important;
+  color: white !important;
+  min-height: 100vh;
+}
+
+body.dark-theme .attendance-header h1,
+body.dark-theme .attendance-header p {
+  color: white !important;
+}
+
+body.dark-theme .attendance-card {
+  background: #1e293b !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .attendance-card h3,
+body.dark-theme .attendance-card p,
+body.dark-theme .attendance-info p,
+body.dark-theme .attendance-info strong {
+  color: white !important;
+}
+
+body.dark-theme .attendance-count {
+  background: #334155 !important;
+  color: white !important;
+}

@@ -10,6 +10,7 @@ import ForgotPasswordPage from "../pages/ForgotPassword/ForgotPassword";
 import DashboardPage from "../pages/Dashboard/DashboardPage";
 import EmployeesPage from "../pages/Employees/EmployeesPage";
 import DepartmentsPage from "../pages/Departments/DepartmentsPage";
+import CompanyPage from "../pages/Company/CompanyPage";
 import AttendancePage from "../pages/Attendance/AttendancePage";
 import SettingsPage from "../pages/Settings/SettingsPage";
 import SignupPage from "../pages/SignupPage/SignupPage";
@@ -67,6 +68,10 @@ element={<SignupPage />}
               path="/departments"
               element={<DepartmentsPage />}
             />
+            <Route
+path="/company"
+element={<CompanyPage />}
+/>
 
             <Route
               path="/attendance"

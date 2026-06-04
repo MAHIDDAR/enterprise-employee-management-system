@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 
+
 request_router = APIRouter()
+
 
 requests_db = []
 
@@ -21,6 +23,8 @@ def send_request(data: dict):
         "password": data.get("password"),
 
         "adminEmail": data.get("adminEmail"),
+
+        "company": data.get("company"),
 
         "status": "pending"
 
@@ -49,6 +53,7 @@ def get_requests():
 
 from app.routes.auth_routes import users
 
+
 @request_router.put("/requests/{request_id}/approve")
 def approve_request(request_id: int):
 
@@ -63,6 +68,10 @@ def approve_request(request_id: int):
                 if user["email"] == request["email"]:
 
                     user["role"] = "admin"
+
+                    if request.get("company"):
+
+                        user["company"] = request.get("company")
 
                     break
 

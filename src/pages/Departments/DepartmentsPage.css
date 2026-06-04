@@ -1,0 +1,37 @@
+/* DEPARTMENTS DARK MODE */
+
+body.dark-theme .departments-page,
+body.dark-theme .department-page {
+  background: #111827 !important;
+  color: white !important;
+  min-height: 100vh;
+}
+
+body.dark-theme .departments-header h1,
+body.dark-theme .departments-header p,
+body.dark-theme .department-header h1,
+body.dark-theme .department-header p {
+  color: white !important;
+}
+
+body.dark-theme .department-card,
+body.dark-theme .departments-card,
+body.dark-theme .department-box {
+  background: #1e293b !important;
+  color: white !important;
+  border-color: #334155 !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .department-card h3,
+body.dark-theme .department-card p,
+body.dark-theme .departments-card h3,
+body.dark-theme .departments-card p {
+  color: white !important;
+}
+
+body.dark-theme .department-list,
+body.dark-theme .department-item {
+  background: #1e293b !important;
+  color: white !important;
+}

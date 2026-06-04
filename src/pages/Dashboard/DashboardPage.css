@@ -107,3 +107,173 @@ color:white;
 color:white;
 
 }
+/* DASHBOARD DARK MODE FIX */
+
+body.dark-theme,
+.dark {
+  background: #111827;
+  color: white;
+}
+
+body.dark-theme .dashboard-page,
+.dark .dashboard-page {
+  background: #111827 !important;
+  color: white !important;
+  min-height: 100vh;
+}
+
+body.dark-theme .dashboard-header h1,
+body.dark-theme .dashboard-header p,
+.dark .dashboard-header h1,
+.dark .dashboard-header p {
+  color: white !important;
+}
+
+body.dark-theme .dashboard-message,
+.dark .dashboard-message {
+  color: white !important;
+}
+
+body.dark-theme .dashboard-grid,
+.dark .dashboard-grid {
+  background: #111827 !important;
+}
+
+body.dark-theme .date-btn,
+.dark .date-btn {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* DASHBOARD CARDS */
+body.dark-theme .dashboard-card,
+body.dark-theme .card,
+body.dark-theme .stats-card,
+body.dark-theme .summary-card,
+.dark .dashboard-card,
+.dark .card,
+.dark .stats-card,
+.dark .summary-card {
+  background: #1e293b !important;
+  color: white !important;
+}
+
+body.dark-theme .dashboard-card h1,
+body.dark-theme .dashboard-card h2,
+body.dark-theme .dashboard-card h3,
+body.dark-theme .dashboard-card p,
+body.dark-theme .card h1,
+body.dark-theme .card h2,
+body.dark-theme .card h3,
+body.dark-theme .card p,
+.dark .dashboard-card h1,
+.dark .dashboard-card h2,
+.dark .dashboard-card h3,
+.dark .dashboard-card p,
+.dark .card h1,
+.dark .card h2,
+.dark .card h3,
+.dark .card p {
+  color: white !important;
+}
+
+/* EMPLOYEE CHART / RECENT EMPLOYEES */
+body.dark-theme .employee-chart,
+body.dark-theme .chart-card,
+body.dark-theme .employee-overview,
+body.dark-theme .recent-employees,
+body.dark-theme .employee-table,
+.dark .employee-chart,
+.dark .chart-card,
+.dark .employee-overview,
+.dark .recent-employees,
+.dark .employee-table {
+  background: #1e293b !important;
+  color: white !important;
+}
+
+body.dark-theme .employee-chart h2,
+body.dark-theme .chart-card h2,
+body.dark-theme .employee-overview h2,
+body.dark-theme .recent-employees h2,
+body.dark-theme .employee-table h2,
+.dark .employee-chart h2,
+.dark .chart-card h2,
+.dark .employee-overview h2,
+.dark .recent-employees h2,
+.dark .employee-table h2 {
+  color: white !important;
+}
+
+body.dark-theme .recent-employees h3,
+body.dark-theme .recent-employees p,
+body.dark-theme .recent-employees span,
+body.dark-theme .employee-table h3,
+body.dark-theme .employee-table p,
+body.dark-theme .employee-table span,
+.dark .recent-employees h3,
+.dark .recent-employees p,
+.dark .recent-employees span,
+.dark .employee-table h3,
+.dark .employee-table p,
+.dark .employee-table span {
+  color: white !important;
+}
+
+body.dark-theme .recent-employees button,
+.dark .recent-employees button {
+  background: white !important;
+  color: #0f172a !important;
+}
+
+/* PIE CHART DARK MODE */
+body.dark-theme .attendance-chart,
+body.dark-theme .pie-chart,
+body.dark-theme .pie-chart-card,
+body.dark-theme .attendance-pie,
+body.dark-theme .recharts-wrapper,
+.dark .attendance-chart,
+.dark .pie-chart,
+.dark .pie-chart-card,
+.dark .attendance-pie,
+.dark .recharts-wrapper {
+  background: #1e293b !important;
+  color: white !important;
+}
+
+body.dark-theme .attendance-chart,
+body.dark-theme .pie-chart-card,
+body.dark-theme .attendance-pie,
+.dark .attendance-chart,
+.dark .pie-chart-card,
+.dark .attendance-pie {
+  border-radius: 18px;
+  box-shadow: none !important;
+}
+
+body.dark-theme .recharts-surface,
+.dark .recharts-surface {
+  background: #1e293b !important;
+}
+
+body.dark-theme .recharts-text,
+body.dark-theme .recharts-label,
+body.dark-theme .recharts-legend-item-text,
+.dark .recharts-text,
+.dark .recharts-label,
+.dark .recharts-legend-item-text {
+  fill: white !important;
+  color: white !important;
+}
+
+body.dark-theme .recharts-cartesian-axis-tick-value,
+.dark .recharts-cartesian-axis-tick-value {
+  fill: #cbd5e1 !important;
+}
+
+body.dark-theme select,
+.dark select {
+  background: #334155 !important;
+  color: white !important;
+  border: 1px solid #475569 !important;
+}

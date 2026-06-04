@@ -26,6 +26,10 @@ function EmployeesPage() {
   const role =
     localStorage.getItem("role");
 
+  const company =
+    localStorage.getItem("company") ||
+    "Stackly";
+
   const isAdmin =
     role === "admin";
 
@@ -85,6 +89,8 @@ function EmployeesPage() {
       department: "",
       city: "",
       phone: "",
+      company: company,
+      status: "Active",
     });
 
   useEffect(() => {
@@ -136,13 +142,19 @@ function EmployeesPage() {
 
     event.preventDefault();
 
+    const employeeData = {
+      ...formData,
+      company: company,
+      status: formData.status || "Active",
+    };
+
     try {
 
       if (editEmployeeId) {
 
         await updateEmployeeApi(
           editEmployeeId,
-          formData
+          employeeData
         );
 
         addNotification(
@@ -156,7 +168,7 @@ function EmployeesPage() {
       } else {
 
         await addEmployeeApi(
-          formData
+          employeeData
         );
 
         addNotification(
@@ -176,6 +188,8 @@ function EmployeesPage() {
         department: "",
         city: "",
         phone: "",
+        company: company,
+        status: "Active",
       });
 
       setEditEmployeeId(null);
@@ -210,6 +224,10 @@ function EmployeesPage() {
         employee.department,
       city: employee.city,
       phone: employee.phone,
+      company:
+        employee.company || company,
+      status:
+        employee.status || "Active",
     });
 
     setEditEmployeeId(
@@ -217,6 +235,51 @@ function EmployeesPage() {
     );
 
     setShowModal(true);
+  };
+
+  // STATUS CHANGE
+  const handleStatusChange = async (
+    employee,
+    newStatus
+  ) => {
+
+    if (!isAdmin) return;
+
+    try {
+
+      const updatedEmployee = {
+        ...employee,
+        status: newStatus,
+        company: company,
+      };
+
+      await updateEmployeeApi(
+        employee.id,
+        updatedEmployee
+      );
+
+      addNotification(
+        `${employee.name} status changed to ${newStatus}`
+      );
+
+      setSuccessMessage(
+        `${employee.name} status changed to ${newStatus}`
+      );
+
+      await loadEmployees();
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+
+    } catch (error) {
+
+      console.log(error);
+
+      setError(
+        "Status Update Failed"
+      );
+    }
   };
 
   // DELETE
@@ -351,6 +414,10 @@ function EmployeesPage() {
             easily.
           </p>
 
+          <p>
+            Company: {company}
+          </p>
+
         </div>
 
         <button
@@ -375,6 +442,8 @@ function EmployeesPage() {
               department: "",
               city: "",
               phone: "",
+              company: company,
+              status: "Active",
             });
           }}
         >
@@ -419,10 +488,12 @@ function EmployeesPage() {
 
           {[
             ...new Set(
-              employees.map(
-                (employee) =>
-                  employee.department
-              )
+              employees
+                .map(
+                  (employee) =>
+                    employee.department
+                )
+                .filter(Boolean)
             ),
           ].map(
             (
@@ -524,13 +595,13 @@ function EmployeesPage() {
               />
 
               <input
-  type="text"
-  name="department"
-  placeholder="Enter Department"
-  required
-  value={formData.department}
-  onChange={handleChange}
-/>
+                type="text"
+                name="department"
+                placeholder="Enter Department"
+                required
+                value={formData.department}
+                onChange={handleChange}
+              />
 
               <input
                 type="text"
@@ -554,49 +625,49 @@ function EmployeesPage() {
                 }
               />
 
+              <select
+                name="status"
+                required
+                value={formData.status}
+                onChange={handleChange}
+              >
+
+                <option value="Active">
+                  Active
+                </option>
+
+                <option value="Inactive">
+                  Inactive
+                </option>
+
+                <option value="On Leave">
+                  On Leave
+                </option>
+
+              </select>
+
               <div className="modal-buttons">
 
-               <button
+                <button
+                  type="submit"
+                  disabled={
+                    !formData.name.trim()
+                    ||
+                    !formData.email.trim()
+                    ||
+                    !formData.department.trim()
+                    ||
+                    !formData.city.trim()
+                    ||
+                    !formData.phone.trim()
+                  }
+                >
 
-type="submit"
+                  {editEmployeeId
+                    ? "Update Employee"
+                    : "Add Employee"}
 
-disabled={
-
-!formData.name.trim()
-
-||
-
-!formData.email.trim()
-
-||
-
-!formData.department
-||
-
-!formData.city.trim()
-||
-
-!formData.phone.trim()
-
-}
-
->
-
-{
-
-editEmployeeId
-
-?
-
-"Update Employee"
-
-:
-
-"Add Employee"
-
-}
-
-</button>
+                </button>
 
                 <button
                   type="button"
@@ -651,19 +722,37 @@ editEmployeeId
 
                 </div>
 
-                <span
-                  className={
-                    employee.id % 2 ===
-                    0
-                      ? "status active"
-                      : "status inactive"
+                <select
+                  className={`status-select ${
+                    (employee.status || "Active") === "Active"
+                      ? "active"
+                      : (employee.status || "Active") === "Inactive"
+                      ? "inactive"
+                      : "leave"
+                  }`}
+                  value={employee.status || "Active"}
+                  disabled={!isAdmin}
+                  onChange={(event) =>
+                    handleStatusChange(
+                      employee,
+                      event.target.value
+                    )
                   }
                 >
-                  {employee.id % 2 ===
-                  0
-                    ? "Active"
-                    : "Inactive"}
-                </span>
+
+                  <option value="Active">
+                    Active
+                  </option>
+
+                  <option value="Inactive">
+                    Inactive
+                  </option>
+
+                  <option value="On Leave">
+                    On Leave
+                  </option>
+
+                </select>
 
               </div>
 
@@ -690,6 +779,13 @@ editEmployeeId
                     Phone:
                   </strong>{" "}
                   {employee.phone}
+                </p>
+
+                <p>
+                  <strong>
+                    Company:
+                  </strong>{" "}
+                  {employee.company || company}
                 </p>
 
               </div>

@@ -1,6 +1,7 @@
 import {
 useState,
-useEffect
+useEffect,
+useContext
 } from "react";
 
 import {
@@ -14,9 +15,18 @@ rejectRequestApi
 
 from "../../services/authService";
 
+import {
+ThemeContext
+} from "../../context/ThemeContext";
+
 import "./SettingsPage.css";
 
 function SettingsPage(){
+
+const {
+darkMode,
+toggleTheme
+} = useContext(ThemeContext);
 
 const role=
 localStorage.getItem("role");
@@ -24,12 +34,8 @@ localStorage.getItem("role");
 const email=
 localStorage.getItem("email");
 
-const [darkMode,setDarkMode]=
-useState(
-
-localStorage.getItem("theme")==="dark"
-
-);
+const company=
+localStorage.getItem("company") || "Stackly";
 
 const [formData,setFormData]=
 useState({
@@ -55,46 +61,6 @@ loadRequests();
 }
 
 },[role]);
-
-useEffect(()=>{
-
-if(darkMode){
-
-document.body.classList.add(
-
-"dark-theme"
-
-);
-
-localStorage.setItem(
-
-"theme",
-
-"dark"
-
-);
-
-}
-
-else{
-
-document.body.classList.remove(
-
-"dark-theme"
-
-);
-
-localStorage.setItem(
-
-"theme",
-
-"light"
-
-);
-
-}
-
-},[darkMode]);
 
 const loadRequests=
 async()=>{
@@ -163,7 +129,11 @@ formData.password,
 
 adminEmail:
 
-formData.adminEmail
+formData.adminEmail,
+
+company:
+
+company
 
 });
 
@@ -281,15 +251,7 @@ type="checkbox"
 
 checked={darkMode}
 
-onChange={()=>{
-
-setDarkMode(
-
-!darkMode
-
-)
-
-}}
+onChange={toggleTheme}
 
 />
 
@@ -386,6 +348,20 @@ Role:
 {" "}
 
 {role}
+
+</p>
+
+<p>
+
+<strong>
+
+Company:
+
+</strong>
+
+{" "}
+
+{company}
 
 </p>
 
@@ -533,9 +509,23 @@ Email:
 
 </p>
 
+<p>
+
+<strong>
+
+Company:
+
+</strong>
+
+{" "}
+
+{request.company || "Stackly"}
+
+</p>
+
 </div>
 
-<div>
+<div className="request-buttons">
 
 <button
 

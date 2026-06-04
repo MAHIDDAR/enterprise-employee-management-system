@@ -8,3 +8,40 @@
 .attendance-chart h3 {
   margin-bottom: 20px;
 }
+/* ATTENDANCE PIE DARK MODE */
+
+body.dark-theme .attendance-chart,
+.dark .attendance-chart {
+  background: #1e293b !important;
+  color: white !important;
+  border-radius: 18px;
+}
+
+body.dark-theme .attendance-chart h2,
+body.dark-theme .attendance-chart h3,
+body.dark-theme .attendance-chart p,
+.dark .attendance-chart h2,
+.dark .attendance-chart h3,
+.dark .attendance-chart p {
+  color: white !important;
+}
+
+body.dark-theme .attendance-chart .recharts-wrapper,
+.dark .attendance-chart .recharts-wrapper {
+  background: #1e293b !important;
+}
+
+body.dark-theme .attendance-chart .recharts-surface,
+.dark .attendance-chart .recharts-surface {
+  background: #1e293b !important;
+}
+
+body.dark-theme .attendance-chart text,
+.dark .attendance-chart text {
+  fill: white !important;
+}
+
+body.dark-theme .attendance-chart .recharts-legend-item-text,
+.dark .attendance-chart .recharts-legend-item-text {
+  color: white !important;
+}

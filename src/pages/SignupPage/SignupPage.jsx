@@ -24,6 +24,8 @@ email:"",
 
 password:"",
 
+company:"",
+
 role:""
 
 });
@@ -134,9 +136,43 @@ onChange={handleChange}
 
 <select
 
+name="company"
+
+required
+
+value={formData.company}
+
+onChange={handleChange}
+
+>
+
+<option value="">
+
+Select Company
+
+</option>
+
+<option value="Stackly">
+
+Stackly
+
+</option>
+
+<option value="TCS">
+
+TCS
+
+</option>
+
+</select>
+
+<select
+
 name="role"
 
 required
+
+value={formData.role}
 
 onChange={handleChange}
 

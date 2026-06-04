@@ -1,23 +1,65 @@
 from fastapi import APIRouter
 from app.utils.jwt_handler import create_access_token
 
+
 auth_router = APIRouter()
+
 
 users = [
 
     {
-        "email":"admin@gmail.com",
-        "password":"admin123",
-        "role":"admin"
+        "name": "Stackly Admin",
+        "email": "admin@gmail.com",
+        "password": "admin123",
+        "role": "admin",
+        "company": "Stackly"
     },
 
     {
-        "email":"user@gmail.com",
-        "password":"user123",
-        "role":"user"
+        "name": "Stackly User",
+        "email": "user@gmail.com",
+        "password": "user123",
+        "role": "user",
+        "company": "Stackly"
+    },
+
+    {
+        "name": "TCS Admin",
+        "email": "tcsadmin@gmail.com",
+        "password": "admin123",
+        "role": "admin",
+        "company": "TCS"
+    },
+
+    {
+        "name": "TCS User",
+        "email": "tcsuser@gmail.com",
+        "password": "user123",
+        "role": "user",
+        "company": "TCS"
     }
 
 ]
+
+
+# NORMALIZE COMPANY NAME
+
+def normalize_company(company):
+
+    if not company:
+
+        return "Stackly"
+
+    if company.lower() == "tcs":
+
+        return "TCS"
+
+    if company.lower() == "stackly":
+
+        return "Stackly"
+
+    return company.strip()
+
 
 # SIGNUP
 
@@ -28,41 +70,31 @@ def signup(user: dict):
     password = user.get("password")
     role = user.get("role")
     name = user.get("name")
-
-    # CHECK EXISTING USER
+    company = normalize_company(
+        user.get("company")
+    )
 
     for existing_user in users:
 
         if existing_user["email"].lower() == email.lower():
 
             return {
-                "message":"User Already Exists"
-            }
-
-    # ADMIN RESTRICTION
-
-    if role == "admin":
-
-        allowed_admin = "mahiddar@gmail.com"
-
-        if email.lower() != allowed_admin.lower():
-
-            return {
-                "message":"Only Mahiddar Can Create Admin Account"
+                "message": "User Already Exists"
             }
 
     users.append({
 
-        "name":name,
-        "email":email,
-        "password":password,
-        "role":role
+        "name": name,
+        "email": email,
+        "password": password,
+        "role": role,
+        "company": company
 
     })
 
     return {
 
-        "message":"Signup Successful"
+        "message": "Signup Successful"
 
     }
 
@@ -75,26 +107,37 @@ def login(user: dict):
     email = user.get("email")
     password = user.get("password")
     role = user.get("role")
+    company = normalize_company(
+        user.get("company")
+    )
 
     for existing_user in users:
 
         if (
 
-            existing_user["email"].lower()
+            existing_user.get("email", "").lower()
             ==
             email.lower()
 
             and
 
-            existing_user["password"]
+            existing_user.get("password")
             ==
             password
 
             and
 
-            existing_user["role"]
+            existing_user.get("role")
             ==
             role
+
+            and
+
+            normalize_company(
+                existing_user.get("company")
+            )
+            ==
+            company
 
         ):
 
@@ -102,8 +145,9 @@ def login(user: dict):
 
                 data={
 
-                    "email":email,
-                    "role":role
+                    "email": email,
+                    "role": role,
+                    "company": company
 
                 }
 
@@ -111,17 +155,50 @@ def login(user: dict):
 
             return {
 
-                "message":"Login Successful",
-                "role":existing_user["role"],
-                "token":token
+                "message": "Login Successful",
+                "role": existing_user["role"],
+                "company": company,
+                "token": token
 
             }
 
     return {
 
-        "message":"Invalid Credentials"
+        "message": "Invalid Credentials"
 
     }
+
+
+# GET USERS BY COMPANY
+
+@auth_router.get("/auth/users")
+def get_users(company: str):
+
+    company = normalize_company(company)
+
+    company_users = []
+
+    for user in users:
+
+        if normalize_company(
+            user.get("company")
+        ) == company:
+
+            company_users.append({
+
+                "name": user.get("name"),
+
+                "email": user.get("email"),
+
+                "role": user.get("role"),
+
+                "company": normalize_company(
+                    user.get("company")
+                )
+
+            })
+
+    return company_users
 
 
 # FORGOT PASSWORD
@@ -140,12 +217,12 @@ def forgot_password(user: dict):
 
             return {
 
-                "message":"Password Updated Successfully"
+                "message": "Password Updated Successfully"
 
             }
 
     return {
 
-        "message":"User Not Found"
+        "message": "User Not Found"
 
     }

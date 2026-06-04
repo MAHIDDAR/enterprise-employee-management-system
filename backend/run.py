@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database.database import Base
 from app.database.database import engine
 
+# IMPORT MODELS
+from app.models.employee_model import Employee
+from app.models.company_model import Company
+
 from app.routes.employee_routes import router
 from app.routes.auth_routes import auth_router
 from app.routes.request_routes import request_router
@@ -33,7 +37,6 @@ app.add_middleware(
 
 
 # ROUTES
-
 app.include_router(router)
 
 app.include_router(auth_router)

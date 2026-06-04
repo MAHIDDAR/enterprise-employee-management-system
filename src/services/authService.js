@@ -129,3 +129,21 @@ await axios.put(
 return response.data
 
 }
+// GET USERS BY COMPANY
+
+export const getCompanyUsersApi =
+async()=>{
+
+const company =
+localStorage.getItem("company") || "Stackly";
+
+const response =
+await axios.get(
+
+`http://127.0.0.1:8000/auth/users?company=${company}`
+
+);
+
+return response.data;
+
+};

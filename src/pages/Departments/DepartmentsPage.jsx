@@ -7,6 +7,8 @@ import {
   fetchEmployees
 } from "../../services/employeeService";
 
+import "./DepartmentsPage.css";
+
 
 function DepartmentsPage() {
 

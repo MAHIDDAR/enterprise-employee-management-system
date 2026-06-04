@@ -4,22 +4,27 @@ from sqlalchemy import String
 
 from app.database.database import Base
 
+
 class Employee(Base):
 
-    __tablename__="employees"
+    __tablename__ = "employees"
 
-    id=Column(
+    id = Column(
         Integer,
         primary_key=True,
         index=True
     )
 
-    name=Column(String)
+    name = Column(String)
 
-    email=Column(String)
+    email = Column(String)
 
-    department=Column(String)
+    department = Column(String)
 
-    city=Column(String)
+    city = Column(String)
 
-    phone=Column(String)
+    phone = Column(String)
+
+    company = Column(String)
+
+    status = Column(String, default="Active")

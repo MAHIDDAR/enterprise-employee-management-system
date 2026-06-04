@@ -7,14 +7,52 @@ import {
   Legend,
 } from "recharts";
 
+import {
+  useContext,
+} from "react";
+
+import {
+  EmployeeContext,
+} from "../../context/EmployeeContext";
+
 import "./AttendanceChart.css";
 
 function AttendanceChart() {
 
+  const { employees } =
+    useContext(EmployeeContext);
+
+  const activeCount =
+    employees.filter(
+      (employee) =>
+        (employee.status || "Active") === "Active"
+    ).length;
+
+  const inactiveCount =
+    employees.filter(
+      (employee) =>
+        employee.status === "Inactive"
+    ).length;
+
+  const onLeaveCount =
+    employees.filter(
+      (employee) =>
+        employee.status === "On Leave"
+    ).length;
+
   const data = [
-    { name: "Present", value: 78 },
-    { name: "Absent", value: 12 },
-    { name: "Leave", value: 10 },
+    {
+      name: "Present",
+      value: activeCount,
+    },
+    {
+      name: "Absent",
+      value: inactiveCount,
+    },
+    {
+      name: "Leave",
+      value: onLeaveCount,
+    },
   ];
 
   const COLORS = [

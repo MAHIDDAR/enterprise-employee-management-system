@@ -188,3 +188,104 @@ button:disabled {
   cursor: not-allowed;
 
 }
+.status-select{
+
+padding:6px 12px;
+
+border-radius:20px;
+
+font-size:13px;
+
+font-weight:600;
+
+border:none;
+
+outline:none;
+
+cursor:pointer;
+
+}
+
+.status-select:disabled{
+
+cursor:not-allowed;
+
+opacity:0.8;
+
+}
+
+.status-select.active{
+
+background:#dcfce7;
+
+color:#15803d;
+
+}
+
+.status-select.inactive{
+
+background:#fee2e2;
+
+color:#dc2626;
+
+}
+
+.status-select.leave{
+
+background:#fef3c7;
+
+color:#92400e;
+
+}
+/* EMPLOYEES DARK MODE */
+
+body.dark-theme .employees-page {
+  background: #111827 !important;
+  color: white !important;
+  min-height: 100vh;
+}
+
+body.dark-theme .employees-header h1,
+body.dark-theme .employees-header p {
+  color: white !important;
+}
+
+body.dark-theme .employee-card,
+body.dark-theme .employee-modal {
+  background: #1e293b !important;
+  color: white !important;
+  border-color: #334155 !important;
+}
+
+body.dark-theme .employee-card h3,
+body.dark-theme .employee-card p,
+body.dark-theme .employee-info p,
+body.dark-theme .employee-info strong {
+  color: white !important;
+}
+
+body.dark-theme .employee-controls select,
+body.dark-theme .employee-modal input,
+body.dark-theme .employee-modal select {
+  background: #334155 !important;
+  color: white !important;
+  border: 1px solid #475569 !important;
+}
+
+body.dark-theme .employee-modal input::placeholder {
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .modal-overlay {
+  background: rgba(0,0,0,0.7) !important;
+}
+
+body.dark-theme .success-message {
+  background: #064e3b !important;
+  color: white !important;
+}
+
+body.dark-theme .error-message {
+  background: #7f1d1d !important;
+  color: white !important;
+}
