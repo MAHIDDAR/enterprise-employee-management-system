@@ -1,19 +1,38 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.auth_routes import auth_router
+from app.database.database import Base
+from app.database.database import engine
+
 from app.routes.employee_routes import router
-from app.controllers.request_controller import request_router
+from app.routes.auth_routes import auth_router
+from app.routes.request_routes import request_router
+
+
+# CREATE DATABASE TABLES
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
+
+# CORS
 app.add_middleware(
+
     CORSMiddleware,
+
     allow_origins=["*"],
+
     allow_credentials=True,
+
     allow_methods=["*"],
-    allow_headers=["*"],
+
+    allow_headers=["*"]
+
 )
+
+
+# ROUTES
 
 app.include_router(router)
 
@@ -26,5 +45,7 @@ app.include_router(request_router)
 def home():
 
     return {
-        "message":"Backend Running"
+
+        "message": "Backend Running"
+
     }

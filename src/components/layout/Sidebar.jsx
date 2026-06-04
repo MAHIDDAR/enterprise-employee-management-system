@@ -1,116 +1,111 @@
 import { NavLink } from "react-router-dom";
 
 import {
-  FaHome,
-  FaUsers,
-  FaBuilding,
-  FaCalendarCheck,
-  FaCog,
+ FaHome,
+ FaUsers,
+ FaBuilding,
+ FaCalendarCheck,
+ FaCog,
 } from "react-icons/fa";
 
 import "./Sidebar.css";
 
 function Sidebar() {
 
-  const role =
-    localStorage.getItem("role");
+ const role =
+ localStorage.getItem("role");
 
-  const menuItems = [
+ const menuItems = [
 
-    {
-      name:"Dashboard",
-      path:"/dashboard",
-      icon:<FaHome/>
-    },
+ {
+ name:"Dashboard",
+ path:"/dashboard",
+ icon:<FaHome/>
+ },
 
-    {
-      name:"Employees",
-      path:"/employees",
-      icon:<FaUsers/>
-    },
+ {
+ name:"Employees",
+ path:"/employees",
+ icon:<FaUsers/>
+ },
 
-    {
-      name:"Departments",
-      path:"/departments",
-      icon:<FaBuilding/>
-    }
+ {
+ name:"Departments",
+ path:"/departments",
+ icon:<FaBuilding/>
+ }
 
-  ];
+ ];
 
-  
+ // ADMIN ONLY ATTENDANCE
 
-  // ADMIN ONLY ATTENDANCE
+ if(role==="admin"){
 
-  if(role==="admin"){
+ menuItems.push({
 
-    menuItems.push({
+ name:"Attendance",
 
-      name:"Attendance",
+ path:"/attendance",
 
-      path:"/attendance",
+ icon:<FaCalendarCheck/>
 
-      icon:<FaCalendarCheck/>
+ });
 
-    });
-    // USER + ADMIN SETTINGS
+ }
 
-  menuItems.push({
+ // SETTINGS FOR BOTH USER + ADMIN
 
-    name:"Settings",
+ menuItems.push({
 
-    path:"/settings",
+ name:"Settings",
 
-    icon:<FaCog/>
+ path:"/settings",
 
-  });
+ icon:<FaCog/>
 
-  }
+ });
 
-  return (
+ return (
 
-    <aside className="sidebar">
+ <aside className="sidebar">
 
-      <div className="logo">
+ <div className="logo">
 
-        <h2>EEMS</h2>
+ <h2>EEMS</h2>
 
-      </div>
+ </div>
 
-      <nav className="sidebar-nav">
+ <nav className="sidebar-nav">
 
-        {
+ {
 
-          menuItems.map((item)=>(
+ menuItems.map((item)=>(
 
-            <NavLink
+ <NavLink
 
-              key={item.name}
+ key={item.name}
 
-              to={item.path}
+ to={item.path}
 
-              className="nav-item"
+ className="nav-item"
 
-            >
+ >
 
-              <span>
-                {item.icon}
-              </span>
+ <span>{item.icon}</span>
 
-              <span>
-                {item.name}
-              </span>
+ <span>{item.name}</span>
 
-            </NavLink>
+ </NavLink>
 
-          ))
+ ))
 
-        }
+ }
 
-      </nav>
+ </nav>
 
-    </aside>
+ </aside>
 
-  );
+ );
 
 }
 

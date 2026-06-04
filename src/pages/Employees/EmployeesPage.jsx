@@ -523,38 +523,14 @@ function EmployeesPage() {
                 }
               />
 
-              <select
-                name="department"
-                required
-                value={
-                  formData.department
-                }
-                onChange={
-                  handleChange
-                }
-              >
-
-                <option value="">
-                  Select Department
-                </option>
-
-                <option>
-                  HR
-                </option>
-
-                <option>
-                  Development
-                </option>
-
-                <option>
-                  Marketing
-                </option>
-
-                <option>
-                  Finance
-                </option>
-
-              </select>
+              <input
+  type="text"
+  name="department"
+  placeholder="Enter Department"
+  required
+  value={formData.department}
+  onChange={handleChange}
+/>
 
               <input
                 type="text"

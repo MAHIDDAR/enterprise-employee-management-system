@@ -78,3 +78,32 @@
 .notification-item:last-child {
   border-bottom: none;
 }
+.dashboard-page{
+
+color:black;
+
+}
+
+.dark .dashboard-page{
+
+color:white;
+
+}
+
+.dark .dashboard-header h1{
+
+color:white;
+
+}
+
+.dark .dashboard-header p{
+
+color:white;
+
+}
+
+.dark .dashboard-message{
+
+color:white;
+
+}
