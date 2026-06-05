@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 
+from app.routes.auth_routes import users
+from app.utils.audit_logger import create_audit_log
+
 
 request_router = APIRouter()
 
@@ -11,6 +14,8 @@ requests_db = []
 
 @request_router.post("/requests")
 def send_request(data: dict):
+
+    company = data.get("company", "Stackly")
 
     new_request = {
 
@@ -24,13 +29,21 @@ def send_request(data: dict):
 
         "adminEmail": data.get("adminEmail"),
 
-        "company": data.get("company"),
+        "company": company,
 
         "status": "pending"
 
     }
 
     requests_db.append(new_request)
+
+    create_audit_log(
+        user_name=data.get("email", "User"),
+        action="Role Change Requested",
+        related_entity=f"user: {data.get('email')}",
+        details=f"Requested admin role from {data.get('adminEmail')}",
+        company=company
+    )
 
     return {
 
@@ -50,9 +63,6 @@ def get_requests():
 
 
 # APPROVE REQUEST
-
-from app.routes.auth_routes import users
-
 
 @request_router.put("/requests/{request_id}/approve")
 def approve_request(request_id: int):
@@ -74,6 +84,14 @@ def approve_request(request_id: int):
                         user["company"] = request.get("company")
 
                     break
+
+            create_audit_log(
+                user_name=request.get("adminEmail", "Admin User"),
+                action="Role Change Approved",
+                related_entity=f"user: {request.get('email')}",
+                details="User role changed to admin",
+                company=request.get("company", "Stackly")
+            )
 
             requests_db.remove(request)
 
@@ -98,6 +116,14 @@ def reject_request(request_id: int):
     for request in requests_db:
 
         if request["id"] == request_id:
+
+            create_audit_log(
+                user_name=request.get("adminEmail", "Admin User"),
+                action="Role Change Rejected",
+                related_entity=f"user: {request.get('email')}",
+                details="Admin role request rejected",
+                company=request.get("company", "Stackly")
+            )
 
             requests_db.remove(request)
 

@@ -6,9 +6,11 @@ import {
   FaBuilding,
   FaCalendarCheck,
   FaCog,
+  FaClipboardList,
 } from "react-icons/fa";
 
 import "./Sidebar.css";
+
 
 function Sidebar() {
 
@@ -30,6 +32,7 @@ function Sidebar() {
     }
 
   ];
+
 
   // ADMIN ONLY PAGES
   if(role==="admin"){
@@ -58,7 +61,16 @@ function Sidebar() {
 
     });
 
+    menuItems.push({
+
+      name:"Audit Logs",
+      path:"/audit-logs",
+      icon:<FaClipboardList/>
+
+    });
+
   }
+
 
   // SETTINGS FOR BOTH USER + ADMIN
   menuItems.push({
@@ -68,6 +80,7 @@ function Sidebar() {
     icon:<FaCog/>
 
   });
+
 
   return (
 

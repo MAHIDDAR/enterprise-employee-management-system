@@ -7,10 +7,12 @@ from app.database.database import engine
 # IMPORT MODELS
 from app.models.employee_model import Employee
 from app.models.company_model import Company
+from app.models.audit_log_model import AuditLog
 
 from app.routes.employee_routes import router
 from app.routes.auth_routes import auth_router
 from app.routes.request_routes import request_router
+from app.routes.audit_routes import audit_router
 
 
 # CREATE DATABASE TABLES
@@ -42,6 +44,8 @@ app.include_router(router)
 app.include_router(auth_router)
 
 app.include_router(request_router)
+
+app.include_router(audit_router)
 
 
 @app.get("/")

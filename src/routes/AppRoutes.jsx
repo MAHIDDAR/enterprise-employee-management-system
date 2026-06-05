@@ -14,11 +14,12 @@ import CompanyPage from "../pages/Company/CompanyPage";
 import AttendancePage from "../pages/Attendance/AttendancePage";
 import SettingsPage from "../pages/Settings/SettingsPage";
 import SignupPage from "../pages/SignupPage/SignupPage";
-
+import AuditLogsPage from "../pages/AuditLogs/AuditLogsPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
+
 
 function AppRoutes() {
 
@@ -33,10 +34,11 @@ function AppRoutes() {
           path="/"
           element={<LoginPage />}
         />
-            <Route
-path="/signup"
-element={<SignupPage />}
-/>  
+
+        <Route
+          path="/signup"
+          element={<SignupPage />}
+        />
 
         {/* FORGOT PASSWORD */}
         <Route
@@ -48,7 +50,6 @@ element={<SignupPage />}
         <Route
           element={<ProtectedRoute />}
         >
-       
 
           <Route
             element={<DashboardLayout />}
@@ -65,17 +66,23 @@ element={<SignupPage />}
             />
 
             <Route
+              path="/company"
+              element={<CompanyPage />}
+            />
+
+            <Route
               path="/departments"
               element={<DepartmentsPage />}
             />
-            <Route
-path="/company"
-element={<CompanyPage />}
-/>
 
             <Route
               path="/attendance"
               element={<AttendancePage />}
+            />
+
+            <Route
+              path="/audit-logs"
+              element={<AuditLogsPage />}
             />
 
             <Route

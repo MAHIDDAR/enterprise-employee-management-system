@@ -4,6 +4,9 @@ from app.database.database import SessionLocal
 
 from app.models.employee_model import Employee
 
+from app.utils.audit_logger import create_audit_log
+
+
 router = APIRouter(
     prefix="/employees",
     tags=["Employees"]
@@ -136,6 +139,11 @@ def add_employee(employee: dict):
 
     company = employee.get("company", "Stackly")
 
+    user_name = employee.get(
+        "userName",
+        employee.get("createdBy", "Admin User")
+    )
+
     new_employee = Employee(
         name=employee["name"],
         email=employee["email"],
@@ -154,6 +162,14 @@ def add_employee(employee: dict):
 
     db.close()
 
+    create_audit_log(
+        user_name=user_name,
+        action="Employee Created",
+        related_entity=f"employee: {new_employee.name}",
+        details=f"Created employee in {new_employee.department}",
+        company=company
+    )
+
     return {
         "message": "Employee Added Successfully"
     }
@@ -171,12 +187,21 @@ def update_employee(
 
     company = updated_employee.get("company", "Stackly")
 
+    user_name = updated_employee.get(
+        "userName",
+        updated_employee.get("updatedBy", "Admin User")
+    )
+
     employee = db.query(Employee).filter(
         Employee.id == employee_id,
         Employee.company == company
     ).first()
 
+    old_status = None
+
     if employee:
+
+        old_status = employee.status
 
         employee.name = updated_employee["name"]
         employee.email = updated_employee["email"]
@@ -191,7 +216,31 @@ def update_employee(
 
         db.commit()
 
+        related_employee_name = employee.name
+
+        new_status = employee.status
+
+    else:
+
+        related_employee_name = "Unknown Employee"
+
+        new_status = None
+
     db.close()
+
+    details = "Employee details updated"
+
+    if old_status and new_status and old_status != new_status:
+
+        details = f"Status changed from {old_status} to {new_status}"
+
+    create_audit_log(
+        user_name=user_name,
+        action="Employee Updated",
+        related_entity=f"employee: {related_employee_name}",
+        details=details,
+        company=company
+    )
 
     return {
         "message": "Employee Updated Successfully"
@@ -203,7 +252,8 @@ def update_employee(
 @router.delete("/{employee_id}")
 def delete_employee(
     employee_id: int,
-    company: str = "Stackly"
+    company: str = "Stackly",
+    userName: str = "Admin User"
 ):
 
     db = SessionLocal()
@@ -213,13 +263,25 @@ def delete_employee(
         Employee.company == company
     ).first()
 
+    employee_name = "Unknown Employee"
+
     if employee:
+
+        employee_name = employee.name
 
         db.delete(employee)
 
         db.commit()
 
     db.close()
+
+    create_audit_log(
+        user_name=userName,
+        action="Employee Deleted",
+        related_entity=f"employee: {employee_name}",
+        details="Employee removed from system",
+        company=company
+    )
 
     return {
         "message": "Employee Deleted Successfully"
