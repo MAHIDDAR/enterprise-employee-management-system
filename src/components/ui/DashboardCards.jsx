@@ -2,23 +2,29 @@ import {
   FaUsers,
   FaBuilding,
   FaUserCheck,
-  FaCalendarCheck,
+  FaClipboardList,
 } from "react-icons/fa";
 
 import "./DashboardCards.css";
 
-function DashboardCards({ employees }) {
+function DashboardCards({
+  employees,
+  analyticsData,
+}) {
 
   const totalEmployees =
+    analyticsData?.totalEmployees ??
     employees.length;
 
   const activeEmployees =
+    analyticsData?.activeEmployees ??
     employees.filter(
       (employee) =>
         (employee.status || "Active") === "Active"
     ).length;
 
   const totalDepartments =
+    analyticsData?.totalDepartments ??
     [
       ...new Set(
         employees
@@ -27,12 +33,8 @@ function DashboardCards({ employees }) {
       ),
     ].length;
 
-  const attendancePercentage =
-    totalEmployees === 0
-      ? 0
-      : Math.round(
-          (activeEmployees / totalEmployees) * 100
-        );
+  const pendingRequests =
+    analyticsData?.pendingRequests ?? 0;
 
   const cards = [
     {
@@ -48,15 +50,15 @@ function DashboardCards({ employees }) {
       color: "#10b981",
     },
     {
-      title: "Departments",
+      title: "Total Departments",
       value: totalDepartments,
       icon: <FaBuilding />,
       color: "#f59e0b",
     },
     {
-      title: "Attendance",
-      value: `${attendancePercentage}%`,
-      icon: <FaCalendarCheck />,
+      title: "Pending Requests",
+      value: pendingRequests,
+      icon: <FaClipboardList />,
       color: "#8b5cf6",
     },
   ];

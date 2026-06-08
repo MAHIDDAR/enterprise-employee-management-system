@@ -1,42 +1,129 @@
 .sidebar {
-  width: 240px;
+  width: 260px;
+  min-width: 260px;
   height: 100vh;
-  background: linear-gradient(
-    180deg,
-    #0f172a,
-    #1e293b
-  );
-
+  background: #1e293b;
   color: white;
-
-  padding: 25px 20px;
-
-  position: fixed;
-  left: 0;
-  top: 0;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .logo {
-  margin-bottom: 40px;
+  margin-bottom: 35px;
+}
+
+.logo h2 {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
 }
 
 .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: white;
   text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
 
-  padding: 12px 14px;
+.nav-icon {
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+}
 
-  border-radius: 10px;
-
-  transition: 0.3s;
+.nav-item.active {
+  background: #d8fddf;
+  color: white;
 }
 
 .nav-item:hover {
-  background-color: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.12);
+}
+
+.sidebar-profile {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.profile-icon {
+  font-size: 38px;
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.profile-info h4 {
+  font-size: 15px;
+  margin: 0;
+  color: white;
+}
+
+.profile-info p {
+  font-size: 12px;
+  margin: 4px 0 0;
+  color: #cbd5e1;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  border: none;
+  background: #ef4444;
+  color: white;
+  padding: 11px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sidebar-logout-btn:hover {
+  background: #dc2626;
+}
+
+/* DARK MODE */
+body.dark-theme .sidebar {
+  background: #0f172a;
 }

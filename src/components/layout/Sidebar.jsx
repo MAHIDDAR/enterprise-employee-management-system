@@ -1,4 +1,11 @@
-import { NavLink } from "react-router-dom";
+import {
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useState,
+} from "react";
 
 import {
   FaHome,
@@ -7,15 +14,35 @@ import {
   FaCalendarCheck,
   FaCog,
   FaClipboardList,
+  FaSignOutAlt,
+  FaUserCircle,
 } from "react-icons/fa";
 
 import "./Sidebar.css";
 
-
 function Sidebar() {
+
+  const navigate =
+    useNavigate();
 
   const role =
     localStorage.getItem("role");
+
+  const email =
+    localStorage.getItem("email");
+
+  const [
+    showLogout,
+    setShowLogout,
+  ] = useState(false);
+
+  const handleLogout = () => {
+
+    localStorage.clear();
+
+    navigate("/");
+
+  };
 
   const menuItems = [
 
@@ -33,8 +60,6 @@ function Sidebar() {
 
   ];
 
-
-  // ADMIN ONLY PAGES
   if(role==="admin"){
 
     menuItems.push({
@@ -71,8 +96,6 @@ function Sidebar() {
 
   }
 
-
-  // SETTINGS FOR BOTH USER + ADMIN
   menuItems.push({
 
     name:"Settings",
@@ -80,7 +103,6 @@ function Sidebar() {
     icon:<FaCog/>
 
   });
-
 
   return (
 
@@ -108,7 +130,7 @@ function Sidebar() {
 
             >
 
-              <span>
+              <span className="nav-icon">
                 {item.icon}
               </span>
 
@@ -123,6 +145,53 @@ function Sidebar() {
         }
 
       </nav>
+
+      <div className="sidebar-profile">
+
+        <div
+          className="profile-info"
+          onClick={() =>
+            setShowLogout(
+              !showLogout
+            )
+          }
+        >
+
+          <FaUserCircle className="profile-icon" />
+
+          <div>
+
+            <h4>
+              {
+                role === "admin"
+                  ? "Admin User"
+                  : "Normal User"
+              }
+            </h4>
+
+            <p>
+              {email}
+            </p>
+
+          </div>
+
+        </div>
+
+        {
+          showLogout &&
+          <button
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+          >
+
+            <FaSignOutAlt />
+
+            Logout
+
+          </button>
+        }
+
+      </div>
 
     </aside>
 

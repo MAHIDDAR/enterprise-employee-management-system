@@ -176,3 +176,227 @@ body.dark-theme .dropdown-menu,
 .navbar-empty {
   flex: 1;
 }
+.navbar-empty {
+  flex: 1;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-btn {
+  width: 54px;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.notification-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.notification-dropdown {
+  position: absolute;
+  top: 65px;
+  right: 0;
+  width: 280px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 15px;
+  z-index: 999;
+}
+
+.notification-dropdown h4 {
+  margin-bottom: 12px;
+  color: #0f172a;
+}
+
+.notification-dropdown p {
+  color: #64748b;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+/* DARK MODE */
+body.dark-theme .notification-btn {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+body.dark-theme .notification-dropdown {
+  background: #1e293b !important;
+  color: white !important;
+  border: 1px solid #334155;
+}
+
+body.dark-theme .notification-dropdown h4,
+body.dark-theme .notification-dropdown p,
+body.dark-theme .notification-item {
+  color: white !important;
+}
+
+body.dark-theme .notification-item {
+  border-bottom: 1px solid #334155;
+}
+.navbar {
+  height: 80px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 35px;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-btn {
+  border: none;
+  background: transparent;
+  color: #1e293b;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.theme-btn,
+.notification-btn {
+  width: 54px;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.profile-section {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.notification-dropdown {
+  position: absolute;
+  top: 65px;
+  right: 0;
+  width: 280px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 15px;
+  z-index: 999;
+}
+
+.notification-dropdown h4 {
+  margin-bottom: 12px;
+  color: #0f172a;
+}
+
+.notification-dropdown p {
+  color: #64748b;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+body.dark-theme .navbar {
+  background: #1e293b !important;
+  border-bottom: 1px solid #334155;
+}
+
+body.dark-theme .menu-btn,
+body.dark-theme .profile-section {
+  color: white !important;
+}
+
+body.dark-theme .notification-dropdown {
+  background: #1e293b !important;
+  color: white !important;
+  border: 1px solid #334155;
+}
+
+body.dark-theme .notification-dropdown h4,
+body.dark-theme .notification-dropdown p,
+body.dark-theme .notification-item {
+  color: white !important;
+}
+
+body.dark-theme .notification-item {
+  border-bottom: 1px solid #334155;
+}

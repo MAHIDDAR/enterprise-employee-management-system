@@ -1,0 +1,55 @@
+.analytics-chart-card{
+
+background:white;
+
+padding:25px;
+
+border-radius:18px;
+
+box-shadow:0 4px 14px rgba(0,0,0,.08);
+
+min-height:360px;
+
+}
+
+.analytics-chart-card h3{
+
+margin-bottom:20px;
+
+font-size:20px;
+
+color:#0f172a;
+
+}
+
+/* DARK MODE */
+
+body.dark-theme .analytics-chart-card{
+
+background:#1e293b !important;
+
+color:white !important;
+
+box-shadow:none !important;
+
+border:1px solid #334155;
+
+}
+
+body.dark-theme .analytics-chart-card h3{
+
+color:white !important;
+
+}
+
+body.dark-theme .analytics-chart-card text{
+
+fill:white !important;
+
+}
+
+body.dark-theme .analytics-chart-card .recharts-legend-item-text{
+
+color:white !important;
+
+}

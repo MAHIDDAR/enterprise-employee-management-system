@@ -10,15 +10,20 @@ import {
 import {
   FaMoon,
   FaSun,
+  FaBars,
 } from "react-icons/fa";
 
 import {
   ThemeContext,
 } from "../../context/ThemeContext";
 
+import {
+  EmployeeContext,
+} from "../../context/EmployeeContext";
+
 import "./Navbar.css";
 
-function Navbar() {
+function Navbar({ toggleSidebar }) {
 
   const navigate =
     useNavigate();
@@ -30,24 +35,34 @@ function Navbar() {
     ThemeContext
   );
 
-  const [showMenu, setShowMenu] =
-    useState(false);
+  const {
+    notifications,
+    unreadCount,
+    clearNotifications,
+  } = useContext(
+    EmployeeContext
+  );
 
-  const handleLogout = () => {
-
-    localStorage.clear();
-
-    navigate("/");
-  };
+  const [
+    showNotifications,
+    setShowNotifications,
+  ] = useState(false);
 
   return (
 
     <header className="navbar">
 
-      {/* LEFT SIDE EMPTY BECAUSE SEARCH REMOVED */}
-      <div className="navbar-empty"></div>
+      <div className="navbar-left">
 
-      {/* RIGHT SIDE */}
+        <button
+          className="menu-btn"
+          onClick={toggleSidebar}
+        >
+          <FaBars />
+        </button>
+
+      </div>
+
       <div className="navbar-right">
 
         <button
@@ -63,45 +78,85 @@ function Navbar() {
 
         </button>
 
-        <div className="profile-wrapper">
+        <div className="notification-wrapper">
 
-          <div
-            className="profile-section"
-            onClick={() =>
-              setShowMenu(
-                !showMenu
-              )
-            }
+          <button
+            className="notification-btn"
+            onClick={() => {
+
+              setShowNotifications(
+                !showNotifications
+              );
+
+              clearNotifications();
+
+            }}
           >
-            {
-              localStorage.getItem(
-                "role"
-              ) === "admin"
-                ? "Admin User"
-                : "Normal User"
-            }
-          </div>
+            🔔
 
-          {showMenu && (
+            {unreadCount > 0 && (
 
-            <div className="dropdown-menu">
+              <span className="notification-count">
+                {unreadCount}
+              </span>
 
-              <button
-                onClick={
-                  handleLogout
-                }
-              >
-                Logout
-              </button>
+            )}
+
+          </button>
+
+          {showNotifications && (
+
+            <div className="notification-dropdown">
+
+              <h4>
+                Notifications
+              </h4>
+
+              {notifications.length === 0 ? (
+
+                <p>
+                  No Notifications
+                </p>
+
+              ) : (
+
+                notifications.map(
+                  (notification) => (
+
+                    <div
+                      key={notification.id}
+                      className="notification-item"
+                    >
+                      {notification.text}
+                    </div>
+
+                  )
+                )
+
+              )}
 
             </div>
+
           )}
+
+        </div>
+
+        <div className="profile-section">
+
+          {
+            localStorage.getItem(
+              "role"
+            ) === "admin"
+              ? "Admin User"
+              : "Normal User"
+          }
 
         </div>
 
       </div>
 
     </header>
+
   );
 }
 

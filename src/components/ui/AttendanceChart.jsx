@@ -17,7 +17,9 @@ import {
 
 import "./AttendanceChart.css";
 
-function AttendanceChart() {
+function AttendanceChart({
+  statusData,
+}) {
 
   const { employees } =
     useContext(EmployeeContext);
@@ -40,20 +42,25 @@ function AttendanceChart() {
         employee.status === "On Leave"
     ).length;
 
-  const data = [
+  const fallbackData = [
     {
-      name: "Present",
+      name: "Active",
       value: activeCount,
     },
     {
-      name: "Absent",
+      name: "Inactive",
       value: inactiveCount,
     },
     {
-      name: "Leave",
+      name: "On Leave",
       value: onLeaveCount,
     },
   ];
+
+  const data =
+    statusData && statusData.length > 0
+      ? statusData
+      : fallbackData;
 
   const COLORS = [
     "#22c55e",
@@ -65,7 +72,7 @@ function AttendanceChart() {
 
     <div className="attendance-chart">
 
-      <h3>Attendance Analytics</h3>
+      <h3>Employee Status Overview</h3>
 
       <ResponsiveContainer
         width="100%"
@@ -89,7 +96,7 @@ function AttendanceChart() {
                 <Cell
                   key={index}
                   fill={
-                    COLORS[index]
+                    COLORS[index % COLORS.length]
                   }
                 />
               )

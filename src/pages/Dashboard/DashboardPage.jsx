@@ -1,21 +1,25 @@
 import {
   useEffect,
   useState,
-  useContext,
 } from "react";
 
 import {
   fetchEmployees,
 } from "../../services/employeeService";
 
+import {
+  getDashboardAnalyticsApi,
+  getEmployeesByDepartmentApi,
+  getEmployeeStatusApi,
+  getRoleCountApi,
+} from "../../services/analyticsService";
+
 import DashboardCards from "../../components/ui/DashboardCards";
 import EmployeeChart from "../../components/ui/EmployeeChart";
 import EmployeeTable from "../../components/ui/EmployeeTable";
 import AttendanceChart from "../../components/ui/AttendanceChart";
-
-import {
-  EmployeeContext,
-} from "../../context/EmployeeContext";
+import DepartmentDistributionChart from "../../components/ui/DepartmentDistributionChart";
+import RoleCountChart from "../../components/ui/RoleCountChart";
 
 import "./DashboardPage.css";
 
@@ -24,24 +28,35 @@ function DashboardPage() {
   const [employees, setEmployees] =
     useState([]);
 
+  const [analyticsData, setAnalyticsData] =
+    useState({
+      totalEmployees: 0,
+      activeEmployees: 0,
+      totalDepartments: 0,
+      pendingRequests: 0,
+    });
+
+  const [
+    departmentData,
+    setDepartmentData,
+  ] = useState([]);
+
+  const [
+    statusData,
+    setStatusData,
+  ] = useState([]);
+
+  const [
+    roleData,
+    setRoleData,
+  ] = useState([]);
+
   const [loading, setLoading] =
     useState(true);
 
   const [error, setError] =
     useState("");
 
-  const [
-    showNotifications,
-    setShowNotifications,
-  ] = useState(false);
-
-  const {
-    notifications,
-    unreadCount,
-    clearNotifications,
-  } = useContext(EmployeeContext);
-
-  // ADDED DYNAMIC DATE
   const currentDate =
     new Date().toLocaleDateString(
       "en-IN",
@@ -54,19 +69,39 @@ function DashboardPage() {
     );
 
   useEffect(() => {
-    loadEmployees();
+    loadDashboardData();
   }, []);
 
-  const loadEmployees = async () => {
+  const loadDashboardData = async () => {
 
     try {
 
       setLoading(true);
 
-      const data =
+      const employeeData =
         await fetchEmployees();
 
-      setEmployees(data);
+      const dashboardAnalytics =
+        await getDashboardAnalyticsApi();
+
+      const departmentAnalytics =
+        await getEmployeesByDepartmentApi();
+
+      const statusAnalytics =
+        await getEmployeeStatusApi();
+
+      const roleAnalytics =
+        await getRoleCountApi();
+
+      setEmployees(employeeData);
+
+      setAnalyticsData(dashboardAnalytics);
+
+      setDepartmentData(departmentAnalytics);
+
+      setStatusData(statusAnalytics);
+
+      setRoleData(roleAnalytics);
 
       setError("");
 
@@ -75,7 +110,7 @@ function DashboardPage() {
       console.log(err);
 
       setError(
-        "Failed to fetch employee data"
+        "Failed to fetch dashboard data"
       );
 
     } finally {
@@ -88,7 +123,7 @@ function DashboardPage() {
 
     return (
       <div className="dashboard-message">
-        Loading employee data...
+        Loading dashboard data...
       </div>
     );
   }
@@ -98,15 +133,6 @@ function DashboardPage() {
     return (
       <div className="dashboard-message error">
         {error}
-      </div>
-    );
-  }
-
-  if (employees.length === 0) {
-
-    return (
-      <div className="dashboard-message">
-        No employees found
       </div>
     );
   }
@@ -132,75 +158,27 @@ function DashboardPage() {
 
         <div className="dashboard-actions">
 
-          {/* NOTIFICATION */}
-          <div className="notification-wrapper">
-
-            <button
-              className="notification-btn"
-              onClick={() => {
-
-                setShowNotifications(
-                  !showNotifications
-                );
-
-                clearNotifications();
-              }}
-            >
-              🔔
-
-              {unreadCount > 0 && (
-
-                <span className="notification-count">
-                  {unreadCount}
-                </span>
-              )}
-
-            </button>
-
-            {showNotifications && (
-
-              <div className="notification-dropdown">
-
-                <h4>
-                  Notifications
-                </h4>
-
-                {notifications.length === 0 ? (
-
-                  <p>
-                    No Notifications
-                  </p>
-
-                ) : (
-
-                  notifications.map(
-                    (notification) => (
-
-                      <div
-                        key={notification.id}
-                        className="notification-item"
-                      >
-                        {notification.text}
-                      </div>
-                    )
-                  )
-                )}
-
-              </div>
-            )}
-
-          </div>
-
-          {/* UPDATED DATE BUTTON */}
-          <button className="date-btn">
+          <button
+            className="date-btn"
+          >
             {currentDate}
+          </button>
+
+          <button
+            className="date-btn"
+            onClick={loadDashboardData}
+          >
+            Refresh
           </button>
 
         </div>
 
       </div>
 
-      <DashboardCards employees={employees} />
+      <DashboardCards
+        employees={employees}
+        analyticsData={analyticsData}
+      />
 
       <div className="dashboard-grid">
 
@@ -208,7 +186,17 @@ function DashboardPage() {
 
         <EmployeeTable employees={employees} />
 
-        <AttendanceChart />
+        <AttendanceChart
+          statusData={statusData}
+        />
+
+        <DepartmentDistributionChart
+          departmentData={departmentData}
+        />
+
+        <RoleCountChart
+          roleData={roleData}
+        />
 
       </div>
 

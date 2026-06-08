@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.routes.auth_routes import users
+from app.routes.auth_routes import normalize_company
 from app.utils.audit_logger import create_audit_log
 
 
@@ -15,7 +16,9 @@ requests_db = []
 @request_router.post("/requests")
 def send_request(data: dict):
 
-    company = data.get("company", "Stackly")
+    company = normalize_company(
+        data.get("company", "Stackly")
+    )
 
     new_request = {
 
@@ -81,7 +84,9 @@ def approve_request(request_id: int):
 
                     if request.get("company"):
 
-                        user["company"] = request.get("company")
+                        user["company"] = normalize_company(
+                            request.get("company")
+                        )
 
                     break
 
@@ -90,7 +95,9 @@ def approve_request(request_id: int):
                 action="Role Change Approved",
                 related_entity=f"user: {request.get('email')}",
                 details="User role changed to admin",
-                company=request.get("company", "Stackly")
+                company=normalize_company(
+                    request.get("company", "Stackly")
+                )
             )
 
             requests_db.remove(request)
@@ -122,7 +129,9 @@ def reject_request(request_id: int):
                 action="Role Change Rejected",
                 related_entity=f"user: {request.get('email')}",
                 details="Admin role request rejected",
-                company=request.get("company", "Stackly")
+                company=normalize_company(
+                    request.get("company", "Stackly")
+                )
             )
 
             requests_db.remove(request)
