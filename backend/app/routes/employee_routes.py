@@ -131,6 +131,7 @@ def get_employees(company: str = "Stackly"):
 
 
 # ADD EMPLOYEE
+# ADD EMPLOYEE
 
 @router.post("/")
 def add_employee(employee: dict):
@@ -143,6 +144,19 @@ def add_employee(employee: dict):
         "userName",
         employee.get("createdBy", "Admin User")
     )
+
+    existing_employee = db.query(Employee).filter(
+        Employee.email == employee["email"],
+        Employee.company == company
+    ).first()
+
+    if existing_employee:
+
+        db.close()
+
+        return {
+            "message": "Employee Already Exists"
+        }
 
     new_employee = Employee(
         name=employee["name"],
@@ -173,7 +187,6 @@ def add_employee(employee: dict):
     return {
         "message": "Employee Added Successfully"
     }
-
 
 # UPDATE EMPLOYEE
 

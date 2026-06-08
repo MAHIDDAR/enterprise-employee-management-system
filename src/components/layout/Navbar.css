@@ -400,3 +400,51 @@ body.dark-theme .notification-item {
 body.dark-theme .notification-item {
   border-bottom: 1px solid #334155;
 }
+.navbar-profile-wrapper {
+  position: relative;
+}
+
+.navbar-profile-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  min-width: 190px;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+  z-index: 999;
+}
+
+.navbar-profile-menu p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #475569;
+  word-break: break-all;
+}
+
+.navbar-profile-menu button {
+  width: 100%;
+  border: none;
+  background: #ef4444;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.navbar-profile-menu button:hover {
+  background: #dc2626;
+}
+
+/* DARK MODE */
+
+body.dark-theme .navbar-profile-menu {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+body.dark-theme .navbar-profile-menu p {
+  color: #cbd5e1;
+}

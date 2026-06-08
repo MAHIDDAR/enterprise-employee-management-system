@@ -48,6 +48,19 @@ function Navbar({ toggleSidebar }) {
     setShowNotifications,
   ] = useState(false);
 
+  const [
+    showProfileMenu,
+    setShowProfileMenu,
+  ] = useState(false);
+
+  const handleLogout = () => {
+
+    localStorage.clear();
+
+    navigate("/");
+
+  };
+
   return (
 
     <header className="navbar">
@@ -65,6 +78,7 @@ function Navbar({ toggleSidebar }) {
 
       <div className="navbar-right">
 
+        {/* DARK / LIGHT BUTTON */}
         <button
           className="theme-btn"
           onClick={toggleTheme}
@@ -78,6 +92,7 @@ function Navbar({ toggleSidebar }) {
 
         </button>
 
+        {/* NOTIFICATION */}
         <div className="notification-wrapper">
 
           <button
@@ -141,15 +156,45 @@ function Navbar({ toggleSidebar }) {
 
         </div>
 
-        <div className="profile-section">
+        {/* PROFILE WITH LOGOUT DROPDOWN */}
+        <div className="navbar-profile-wrapper">
 
-          {
-            localStorage.getItem(
-              "role"
-            ) === "admin"
-              ? "Admin User"
-              : "Normal User"
-          }
+          <div
+            className="profile-section"
+            onClick={() =>
+              setShowProfileMenu(
+                !showProfileMenu
+              )
+            }
+          >
+
+            {
+              localStorage.getItem(
+                "role"
+              ) === "admin"
+                ? "Admin User"
+                : "Normal User"
+            }
+
+          </div>
+
+          {showProfileMenu && (
+
+            <div className="navbar-profile-menu">
+
+              <p>
+                {localStorage.getItem("email")}
+              </p>
+
+              <button
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+
+            </div>
+
+          )}
 
         </div>
 

@@ -20,17 +20,88 @@ def send_request(data: dict):
         data.get("company", "Stackly")
     )
 
+    email = data.get("email")
+
+    password = data.get("password")
+
+    admin_email = data.get("adminEmail")
+
+    # CHECK USER EXISTS AND PASSWORD IS CORRECT
+    current_user = None
+
+    for user in users:
+
+        if (
+            user.get("email", "").lower() == email.lower()
+            and
+            normalize_company(user.get("company")) == company
+        ):
+
+            current_user = user
+
+            break
+
+    if not current_user:
+
+        return {
+            "message": "User Not Found"
+        }
+
+    if current_user.get("password") != password:
+
+        return {
+            "message": "Invalid Credentials"
+        }
+
+    # CHECK ADMIN EMAIL EXISTS IN SAME COMPANY
+    admin_user = None
+
+    for user in users:
+
+        if (
+            user.get("email", "").lower() == admin_email.lower()
+            and
+            user.get("role") == "admin"
+            and
+            normalize_company(user.get("company")) == company
+        ):
+
+            admin_user = user
+
+            break
+
+    if not admin_user:
+
+        return {
+            "message": "Invalid Admin Email"
+        }
+
+    # CHECK IF REQUEST ALREADY EXISTS
+    for request in requests_db:
+
+        if (
+            request.get("email") == email
+            and
+            request.get("company") == company
+            and
+            request.get("status") == "pending"
+        ):
+
+            return {
+                "message": "Request Already Pending"
+            }
+
     new_request = {
 
         "id": len(requests_db) + 1,
 
         "name": data.get("name"),
 
-        "email": data.get("email"),
+        "email": email,
 
-        "password": data.get("password"),
+        "password": password,
 
-        "adminEmail": data.get("adminEmail"),
+        "adminEmail": admin_email,
 
         "company": company,
 
@@ -41,10 +112,10 @@ def send_request(data: dict):
     requests_db.append(new_request)
 
     create_audit_log(
-        user_name=data.get("email", "User"),
+        user_name=email,
         action="Role Change Requested",
-        related_entity=f"user: {data.get('email')}",
-        details=f"Requested admin role from {data.get('adminEmail')}",
+        related_entity=f"user: {email}",
+        details=f"Requested admin role from {admin_email}",
         company=company
     )
 

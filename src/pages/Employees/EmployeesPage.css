@@ -289,3 +289,31 @@ body.dark-theme .error-message {
   background: #7f1d1d !important;
   color: white !important;
 }
+.popup-message {
+  position: fixed;
+  top: 90px;
+  right: 30px;
+  padding: 14px 22px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s ease;
+}
+
+.error-popup {
+  background: #ef4444;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

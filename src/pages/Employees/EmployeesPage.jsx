@@ -47,6 +47,10 @@ function EmployeesPage() {
 
   const [error, setError] =
     useState("");
+    const [
+  popupMessage,
+  setPopupMessage,
+] = useState("");
 
   const [
     successMessage,
@@ -167,17 +171,33 @@ function EmployeesPage() {
 
       } else {
 
-        await addEmployeeApi(
-          employeeData
-        );
+        const response =
+    await addEmployeeApi(
+      employeeData
+    );
 
-        addNotification(
-          `${formData.name} added`
-        );
+  if (
+    response.data.message ===
+    "Employee Already Exists"
+  ) {
 
-        setSuccessMessage(
-          "Employee Added Successfully"
-        );
+   setPopupMessage(
+  "Employee Already Exists"
+);
+
+setTimeout(() => {
+  setPopupMessage("");
+}, 3000);
+    return;
+  }
+
+  addNotification(
+    `${formData.name} added`
+  );
+
+  setSuccessMessage(
+    "Employee Added Successfully"
+  );
       }
 
       await loadEmployees();
@@ -384,6 +404,7 @@ function EmployeesPage() {
 
     return (
       <div className="dashboard-message">
+        
         Loading employees...
       </div>
     );
@@ -401,6 +422,17 @@ function EmployeesPage() {
   return (
 
     <div className="employees-page">
+      {
+  popupMessage && (
+
+    <div className="popup-message error-popup">
+
+      {popupMessage}
+
+    </div>
+
+  )
+}
 
       {/* HEADER */}
       <div className="employees-header">
