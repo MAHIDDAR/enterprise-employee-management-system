@@ -15,6 +15,8 @@ import AttendancePage from "../pages/Attendance/AttendancePage";
 import SettingsPage from "../pages/Settings/SettingsPage";
 import SignupPage from "../pages/SignupPage/SignupPage";
 import AuditLogsPage from "../pages/AuditLogs/AuditLogsPage";
+import InvitationsPage from "../pages/Invitations/InvitationsPage";
+import AccountDeactivatedPage from "../pages/AccountDeactivated/AccountDeactivatedPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -51,6 +53,12 @@ function AppRoutes() {
           element={<ProtectedRoute />}
         >
 
+          {/* DEACTIVATED ACCOUNT PAGE */}
+          <Route
+            path="/account-deactivated"
+            element={<AccountDeactivatedPage />}
+          />
+
           <Route
             element={<DashboardLayout />}
           >
@@ -83,6 +91,11 @@ function AppRoutes() {
             <Route
               path="/audit-logs"
               element={<AuditLogsPage />}
+            />
+
+            <Route
+              path="/invitations"
+              element={<InvitationsPage />}
             />
 
             <Route

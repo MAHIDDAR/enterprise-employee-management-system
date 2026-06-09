@@ -1,0 +1,138 @@
+.deactivated-page{
+
+min-height:100vh;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+background:#f8fafc;
+
+padding:20px;
+
+}
+
+.deactivated-card{
+
+background:white;
+
+padding:35px;
+
+border-radius:18px;
+
+box-shadow:0 8px 24px rgba(0,0,0,.12);
+
+width:100%;
+
+max-width:520px;
+
+text-align:center;
+
+}
+
+.deactivated-card h1{
+
+font-size:32px;
+
+margin-bottom:12px;
+
+color:#dc2626;
+
+}
+
+.deactivated-card p{
+
+color:#475569;
+
+line-height:1.6;
+
+}
+
+.status-box{
+
+background:#f1f5f9;
+
+padding:18px;
+
+border-radius:12px;
+
+text-align:left;
+
+margin:22px 0;
+
+}
+
+.status-box p{
+
+margin-bottom:8px;
+
+}
+
+.deactivated-card button{
+
+width:100%;
+
+border:none;
+
+background:#2563eb;
+
+color:white;
+
+padding:12px;
+
+border-radius:10px;
+
+font-weight:700;
+
+cursor:pointer;
+
+margin-bottom:12px;
+
+}
+
+.logout-btn{
+
+background:#ef4444 !important;
+
+}
+
+.message{
+
+font-weight:700;
+
+color:#166534 !important;
+
+}
+
+/* DARK MODE */
+
+body.dark-theme .deactivated-page{
+
+background:#111827 !important;
+
+}
+
+body.dark-theme .deactivated-card{
+
+background:#1e293b !important;
+
+color:white !important;
+
+border:1px solid #334155;
+
+}
+
+body.dark-theme .deactivated-card p,
+body.dark-theme .status-box p{
+
+color:white !important;
+
+}
+
+body.dark-theme .status-box{
+
+background:#0f172a !important;
+
+}

@@ -2,21 +2,64 @@
   background: white;
   border-radius: 14px;
   padding: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
-.dark .employee-chart{
 
-color:white;
-
+.chart-header h3 {
+  color: #0f172a;
+  font-size: 20px;
 }
 
-.dark .employee-chart h2{
+.chart-header select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  background: white;
+  color: #0f172a;
+}
 
-color:white;
+/* DARK MODE FIX */
 
+body.dark-theme .chart-container {
+  background: #1e293b !important;
+  color: white !important;
+  border: 1px solid #334155;
+  box-shadow: none !important;
+}
+
+body.dark-theme .chart-header h3 {
+  color: white !important;
+}
+
+body.dark-theme .chart-header select {
+  background: #334155 !important;
+  color: white !important;
+  border: 1px solid #475569 !important;
+}
+
+body.dark-theme .chart-container text {
+  fill: white !important;
+}
+
+body.dark-theme .chart-container .recharts-cartesian-grid line {
+  stroke: #475569 !important;
+}
+
+body.dark-theme .chart-container .recharts-default-tooltip {
+  background: #0f172a !important;
+  border: 1px solid #334155 !important;
+  color: white !important;
+}
+
+body.dark-theme .chart-container .recharts-tooltip-label,
+body.dark-theme .chart-container .recharts-tooltip-item {
+  color: white !important;
 }

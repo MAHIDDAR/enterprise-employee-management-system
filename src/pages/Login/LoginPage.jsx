@@ -128,9 +128,42 @@ formData.email
 
 );
 
+localStorage.setItem(
+
+"accountStatus",
+
+response.accountStatus || "Active"
+
+);
+
+localStorage.setItem(
+
+"reactivationStatus",
+
+response.reactivationStatus || "Not Requested"
+
+);
+
+if(
+
+response.accountStatus ===
+"Deactivated"
+
+){
+
+navigate(
+"/account-deactivated"
+);
+
+}
+
+else{
+
 navigate(
 "/dashboard"
 );
+
+}
 
 }
 

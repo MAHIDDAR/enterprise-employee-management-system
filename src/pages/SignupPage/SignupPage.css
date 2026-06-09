@@ -60,3 +60,18 @@ border:none;
 border-radius:8px;
 
 }
+.invite-text {
+  background: #dcfce7;
+  color: #166534;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.signup-form input:disabled,
+.signup-form select:disabled {
+  background: #e5e7eb;
+  color: #475569;
+  cursor: not-allowed;
+}

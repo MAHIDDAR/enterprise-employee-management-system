@@ -12,7 +12,9 @@ users = [
         "email": "admin@gmail.com",
         "password": "admin123",
         "role": "admin",
-        "company": "Stackly"
+        "company": "Stackly",
+        "status": "Active",
+        "reactivationStatus": "Not Requested"
     },
 
     {
@@ -20,7 +22,9 @@ users = [
         "email": "user@gmail.com",
         "password": "user123",
         "role": "user",
-        "company": "Stackly"
+        "company": "Stackly",
+        "status": "Active",
+        "reactivationStatus": "Not Requested"
     },
 
     {
@@ -28,7 +32,9 @@ users = [
         "email": "tcsadmin@gmail.com",
         "password": "admin123",
         "role": "admin",
-        "company": "TCS"
+        "company": "TCS",
+        "status": "Active",
+        "reactivationStatus": "Not Requested"
     },
 
     {
@@ -36,7 +42,9 @@ users = [
         "email": "tcsuser@gmail.com",
         "password": "user123",
         "role": "user",
-        "company": "TCS"
+        "company": "TCS",
+        "status": "Active",
+        "reactivationStatus": "Not Requested"
     }
 
 ]
@@ -88,7 +96,9 @@ def signup(user: dict):
         "email": email,
         "password": password,
         "role": role,
-        "company": company
+        "company": company,
+        "status": "Active",
+        "reactivationStatus": "Not Requested"
 
     })
 
@@ -141,13 +151,24 @@ def login(user: dict):
 
         ):
 
+            account_status = existing_user.get(
+                "status",
+                "Active"
+            )
+
+            reactivation_status = existing_user.get(
+                "reactivationStatus",
+                "Not Requested"
+            )
+
             token = create_access_token(
 
                 data={
 
                     "email": email,
                     "role": role,
-                    "company": company
+                    "company": company,
+                    "status": account_status
 
                 }
 
@@ -158,6 +179,8 @@ def login(user: dict):
                 "message": "Login Successful",
                 "role": existing_user["role"],
                 "company": company,
+                "accountStatus": account_status,
+                "reactivationStatus": reactivation_status,
                 "token": token
 
             }
@@ -194,6 +217,16 @@ def get_users(company: str):
 
                 "company": normalize_company(
                     user.get("company")
+                ),
+
+                "status": user.get(
+                    "status",
+                    "Active"
+                ),
+
+                "reactivationStatus": user.get(
+                    "reactivationStatus",
+                    "Not Requested"
                 )
 
             })

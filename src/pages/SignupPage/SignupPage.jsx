@@ -1,7 +1,12 @@
-import {useState} from "react";
+import {
+useEffect,
+useState
+} from "react";
 
-import {useNavigate}
-from "react-router-dom";
+import {
+useNavigate,
+useSearchParams
+} from "react-router-dom";
 
 import {
 signupApi
@@ -14,6 +19,24 @@ function SignupPage(){
 
 const navigate=
 useNavigate();
+
+const [
+searchParams
+] = useSearchParams();
+
+const invitationEmail =
+searchParams.get("email") || "";
+
+const invitationCompany =
+searchParams.get("company") || "";
+
+const invitationRole =
+searchParams.get("role") || "";
+
+const isInvitationSignup =
+invitationEmail !== "" ||
+invitationCompany !== "" ||
+invitationRole !== "";
 
 const [formData,setFormData]=
 useState({
@@ -32,6 +55,31 @@ role:""
 
 const [message,setMessage]=
 useState("");
+
+useEffect(()=>{
+
+if(isInvitationSignup){
+
+setFormData((previousData)=>({
+
+...previousData,
+
+email:invitationEmail,
+
+company:invitationCompany,
+
+role:invitationRole
+
+}));
+
+}
+
+},[
+invitationEmail,
+invitationCompany,
+invitationRole,
+isInvitationSignup
+]);
 
 const handleChange=(e)=>{
 
@@ -96,6 +144,20 @@ Create Account
 
 </h2>
 
+{
+
+isInvitationSignup && (
+
+<p className="invite-text">
+
+You are signing up using an invitation link.
+
+</p>
+
+)
+
+}
+
 <input
 
 name="name"
@@ -103,6 +165,8 @@ name="name"
 placeholder="Name"
 
 required
+
+value={formData.name}
 
 onChange={handleChange}
 
@@ -116,7 +180,11 @@ placeholder="Email"
 
 required
 
+value={formData.email}
+
 onChange={handleChange}
+
+disabled={isInvitationSignup}
 
 />
 
@@ -129,6 +197,8 @@ name="password"
 placeholder="Password"
 
 required
+
+value={formData.password}
 
 onChange={handleChange}
 
@@ -143,6 +213,8 @@ required
 value={formData.company}
 
 onChange={handleChange}
+
+disabled={isInvitationSignup}
 
 >
 
@@ -175,6 +247,8 @@ required
 value={formData.role}
 
 onChange={handleChange}
+
+disabled={isInvitationSignup}
 
 >
 

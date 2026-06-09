@@ -16,6 +16,7 @@ import {
   FaClipboardList,
   FaSignOutAlt,
   FaUserCircle,
+  FaEnvelopeOpenText,
 } from "react-icons/fa";
 
 import "./Sidebar.css";
@@ -67,6 +68,14 @@ function Sidebar() {
       name:"Company",
       path:"/company",
       icon:<FaBuilding/>
+
+    });
+
+    menuItems.push({
+
+      name:"Invitations",
+      path:"/invitations",
+      icon:<FaEnvelopeOpenText/>
 
     });
 
