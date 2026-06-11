@@ -5,6 +5,8 @@ from app.models.employee_model import Employee
 
 from app.routes.request_routes import requests_db
 from app.routes.auth_routes import users
+from app.routes.auth_routes import normalize_company
+from app.routes.invitation_routes import get_pending_reactivation_count
 
 
 analytics_router = APIRouter(
@@ -19,6 +21,8 @@ analytics_router = APIRouter(
 def get_dashboard_analytics(company: str = "Stackly"):
 
     db = SessionLocal()
+
+    company = normalize_company(company)
 
     employees = db.query(Employee).filter(
         Employee.company == company
@@ -41,11 +45,21 @@ def get_dashboard_analytics(company: str = "Stackly"):
 
     total_departments = len(departments)
 
-    pending_requests = len([
+    pending_role_requests = len([
         request for request in requests_db
         if request.get("company") == company
         and request.get("status") == "pending"
     ])
+
+    pending_reactivation_requests = get_pending_reactivation_count(
+        company
+    )
+
+    pending_requests = (
+        pending_role_requests
+        +
+        pending_reactivation_requests
+    )
 
     db.close()
 
@@ -57,7 +71,11 @@ def get_dashboard_analytics(company: str = "Stackly"):
 
         "totalDepartments": total_departments,
 
-        "pendingRequests": pending_requests
+        "pendingRequests": pending_requests,
+
+        "pendingRoleRequests": pending_role_requests,
+
+        "pendingReactivationRequests": pending_reactivation_requests
 
     }
 
@@ -68,6 +86,8 @@ def get_dashboard_analytics(company: str = "Stackly"):
 def employees_by_department(company: str = "Stackly"):
 
     db = SessionLocal()
+
+    company = normalize_company(company)
 
     employees = db.query(Employee).filter(
         Employee.company == company
@@ -110,6 +130,8 @@ def employees_by_department(company: str = "Stackly"):
 def employee_status_overview(company: str = "Stackly"):
 
     db = SessionLocal()
+
+    company = normalize_company(company)
 
     employees = db.query(Employee).filter(
         Employee.company == company
@@ -159,11 +181,15 @@ def employee_status_overview(company: str = "Stackly"):
 @analytics_router.get("/roles")
 def employee_count_by_role(company: str = "Stackly"):
 
+    company = normalize_company(company)
+
     role_count = {}
 
     for user in users:
 
-        if user.get("company") == company:
+        if normalize_company(
+            user.get("company")
+        ) == company:
 
             role = user.get("role", "user")
 

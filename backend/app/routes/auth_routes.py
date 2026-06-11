@@ -14,7 +14,8 @@ users = [
         "role": "admin",
         "company": "Stackly",
         "status": "Active",
-        "reactivationStatus": "Not Requested"
+        "reactivationStatus": "Not Requested",
+        "deactivatedBy": ""
     },
 
     {
@@ -24,7 +25,8 @@ users = [
         "role": "user",
         "company": "Stackly",
         "status": "Active",
-        "reactivationStatus": "Not Requested"
+        "reactivationStatus": "Not Requested",
+        "deactivatedBy": ""
     },
 
     {
@@ -34,7 +36,8 @@ users = [
         "role": "admin",
         "company": "TCS",
         "status": "Active",
-        "reactivationStatus": "Not Requested"
+        "reactivationStatus": "Not Requested",
+        "deactivatedBy": ""
     },
 
     {
@@ -44,7 +47,8 @@ users = [
         "role": "user",
         "company": "TCS",
         "status": "Active",
-        "reactivationStatus": "Not Requested"
+        "reactivationStatus": "Not Requested",
+        "deactivatedBy": ""
     }
 
 ]
@@ -98,7 +102,8 @@ def signup(user: dict):
         "role": role,
         "company": company,
         "status": "Active",
-        "reactivationStatus": "Not Requested"
+        "reactivationStatus": "Not Requested",
+        "deactivatedBy": ""
 
     })
 
@@ -161,6 +166,11 @@ def login(user: dict):
                 "Not Requested"
             )
 
+            deactivated_by = existing_user.get(
+                "deactivatedBy",
+                ""
+            )
+
             token = create_access_token(
 
                 data={
@@ -181,6 +191,7 @@ def login(user: dict):
                 "company": company,
                 "accountStatus": account_status,
                 "reactivationStatus": reactivation_status,
+                "deactivatedBy": deactivated_by,
                 "token": token
 
             }
@@ -227,6 +238,11 @@ def get_users(company: str):
                 "reactivationStatus": user.get(
                     "reactivationStatus",
                     "Not Requested"
+                ),
+
+                "deactivatedBy": user.get(
+                    "deactivatedBy",
+                    ""
                 )
 
             })

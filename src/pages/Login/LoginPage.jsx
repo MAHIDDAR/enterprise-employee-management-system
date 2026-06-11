@@ -144,6 +144,14 @@ response.reactivationStatus || "Not Requested"
 
 );
 
+localStorage.setItem(
+
+"deactivatedBy",
+
+response.deactivatedBy || ""
+
+);
+
 if(
 
 response.accountStatus ===

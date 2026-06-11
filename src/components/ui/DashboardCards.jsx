@@ -36,6 +36,12 @@ function DashboardCards({
   const pendingRequests =
     analyticsData?.pendingRequests ?? 0;
 
+  const pendingRoleRequests =
+    analyticsData?.pendingRoleRequests ?? 0;
+
+  const pendingReactivationRequests =
+    analyticsData?.pendingReactivationRequests ?? 0;
+
   const cards = [
     {
       title: "Total Employees",
@@ -60,6 +66,7 @@ function DashboardCards({
       value: pendingRequests,
       icon: <FaClipboardList />,
       color: "#8b5cf6",
+      description: `Role: ${pendingRoleRequests} | Reactivation: ${pendingReactivationRequests}`,
     },
   ];
 
@@ -77,6 +84,13 @@ function DashboardCards({
           <div>
             <h4>{card.title}</h4>
             <h2>{card.value}</h2>
+
+            {
+              card.description &&
+              <p className="card-description">
+                {card.description}
+              </p>
+            }
           </div>
         </div>
       ))}

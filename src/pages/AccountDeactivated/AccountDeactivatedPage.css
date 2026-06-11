@@ -136,3 +136,20 @@ body.dark-theme .status-box{
 background:#0f172a !important;
 
 }
+.reactivation-textarea {
+  width: 100%;
+  min-height: 100px;
+  margin: 16px 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  resize: vertical;
+  font-size: 14px;
+  outline: none;
+}
+
+body.dark-theme .reactivation-textarea {
+  background: #1e293b;
+  color: white;
+  border: 1px solid #475569;
+}

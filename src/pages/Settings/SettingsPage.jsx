@@ -16,6 +16,12 @@ rejectRequestApi
 from "../../services/authService";
 
 import {
+getReactivationRequestsApi,
+approveReactivationApi,
+rejectReactivationApi
+} from "../../services/invitationService";
+
+import {
 ThemeContext
 } from "../../context/ThemeContext";
 
@@ -52,11 +58,18 @@ useState("");
 const [requests,setRequests]=
 useState([]);
 
+const [
+reactivationRequests,
+setReactivationRequests
+] = useState([]);
+
 useEffect(()=>{
 
 if(role==="admin"){
 
 loadRequests();
+
+loadReactivationRequests();
 
 }
 
@@ -72,6 +85,34 @@ const data=
 await getPendingRequestsApi();
 
 setRequests(data);
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const loadReactivationRequests =
+async()=>{
+
+try{
+
+const data =
+await getReactivationRequestsApi();
+
+const pendingData =
+data.filter(
+(request)=>
+request.status === "pending"
+);
+
+setReactivationRequests(
+pendingData
+);
 
 }
 
@@ -192,6 +233,48 @@ async(id)=>{
 try{
 
 await rejectRequestApi(id);
+
+loadRequests();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const approveReactivation =
+async(id)=>{
+
+try{
+
+await approveReactivationApi(id);
+
+loadReactivationRequests();
+
+loadRequests();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const rejectReactivation =
+async(id)=>{
+
+try{
+
+await rejectReactivationApi(id);
+
+loadReactivationRequests();
 
 loadRequests();
 
@@ -437,7 +520,7 @@ message &&
 
 }
 
-{/* ADMIN */}
+{/* ADMIN ROLE REQUESTS */}
 
 {
 
@@ -449,7 +532,7 @@ role==="admin"
 
 <h2>
 
-Pending Requests
+Pending Role Requests
 
 </h2>
 
@@ -461,7 +544,7 @@ requests.length===0
 
 <p>
 
-No Requests
+No Role Requests
 
 </p>
 
@@ -554,6 +637,178 @@ className="reject-btn"
 onClick={()=>{
 
 reject(
+
+request.id
+
+)
+
+}}
+
+>
+
+Reject
+
+</button>
+
+</div>
+
+</div>
+
+)
+
+)
+
+}
+
+</div>
+
+}
+
+{/* ADMIN REACTIVATION REQUESTS */}
+
+{
+
+role==="admin"
+
+&&
+
+<div className="settings-card">
+
+<h2>
+
+Reactivation Requests
+
+</h2>
+
+{
+
+reactivationRequests.length===0
+
+?
+
+<p>
+
+No Reactivation Requests
+
+</p>
+
+:
+
+reactivationRequests.map(
+
+(request)=>(
+
+<div
+
+key={request.id}
+
+className="request-card"
+
+>
+
+<div>
+
+<p>
+
+<strong>
+
+User Email:
+
+</strong>
+
+{" "}
+
+{request.email}
+
+</p>
+
+<p>
+
+<strong>
+
+Company:
+
+</strong>
+
+{" "}
+
+{request.company}
+
+</p>
+
+<p>
+
+<strong>
+
+Requested By:
+
+</strong>
+
+{" "}
+
+{request.requestedBy}
+
+</p>
+
+<p>
+
+<strong>
+
+Deactivated By:
+
+</strong>
+
+{" "}
+
+{request.deactivatedBy || "Company Admin"}
+
+</p>
+
+<p>
+
+<strong>
+
+Status:
+
+</strong>
+
+{" "}
+
+{request.status}
+
+</p>
+
+</div>
+
+<div className="request-buttons">
+
+<button
+
+className="approve-btn"
+
+onClick={()=>{
+
+approveReactivation(
+
+request.id
+
+)
+
+}}
+
+>
+
+Approve
+
+</button>
+
+<button
+
+className="reject-btn"
+
+onClick={()=>{
+
+rejectReactivation(
 
 request.id
 

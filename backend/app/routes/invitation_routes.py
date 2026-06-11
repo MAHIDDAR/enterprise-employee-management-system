@@ -18,6 +18,27 @@ invitation_router = APIRouter(
 reactivation_requests = []
 
 
+# PENDING REACTIVATION COUNT FOR DASHBOARD
+
+def get_pending_reactivation_count(company: str):
+
+    company = normalize_company(company)
+
+    count = 0
+
+    for request in reactivation_requests:
+
+        if (
+            request.get("company") == company
+            and
+            request.get("status") == "pending"
+        ):
+
+            count += 1
+
+    return count
+
+
 # CREATE INVITATION
 
 @invitation_router.post("/")
@@ -202,7 +223,14 @@ def get_members(company: str = "Stackly"):
                     user.get("company")
                 ),
                 "status": user.get("status", "Active"),
-                "deactivatedBy": user.get("deactivatedBy", "")
+                "reactivationStatus": user.get(
+                    "reactivationStatus",
+                    "Not Requested"
+                ),
+                "deactivatedBy": user.get(
+                    "deactivatedBy",
+                    ""
+                )
             })
 
     return company_members
@@ -242,7 +270,7 @@ def deactivate_user(data: dict):
                 user_name=deactivated_by,
                 action="User Deactivated",
                 related_entity=f"user: {email}",
-                details="User account deactivated",
+                details=f"User account deactivated by {deactivated_by}",
                 company=company
             )
 
@@ -268,6 +296,10 @@ def submit_reactivation_request(data: dict):
 
     requested_by = data.get("requestedBy", email)
 
+    deactivated_by = data.get("deactivatedBy", "")
+
+    reactivation_message = data.get("message", "")
+
     for request in reactivation_requests:
 
         if (
@@ -282,11 +314,28 @@ def submit_reactivation_request(data: dict):
                 "message": "Request Already Pending"
             }
 
+    for user in users:
+
+        if (
+            user.get("email") == email
+            and
+            normalize_company(user.get("company")) == company
+        ):
+
+            deactivated_by = user.get(
+                "deactivatedBy",
+                deactivated_by
+            )
+
+            break
+
     new_request = {
         "id": len(reactivation_requests) + 1,
         "email": email,
         "company": company,
         "requestedBy": requested_by,
+        "deactivatedBy": deactivated_by,
+        "message": reactivation_message,
         "status": "pending"
     }
 
@@ -304,11 +353,20 @@ def submit_reactivation_request(data: dict):
 
             break
 
+    audit_action = "Reactivation Request Submitted"
+
+    if reactivation_message.strip():
+
+        audit_action = (
+            f"Reactivation Request Submitted - "
+            f"{reactivation_message}"
+        )
+
     create_audit_log(
         user_name=requested_by,
-        action="Reactivation Request Submitted",
+        action=audit_action,
         related_entity=f"user: {email}",
-        details="User submitted reactivation request",
+        details=f"User submitted reactivation request. Deactivated by {deactivated_by}",
         company=company
     )
 
@@ -372,13 +430,23 @@ def approve_reactivation(
 
                     user["reactivationStatus"] = "approved"
 
+                    user["deactivatedBy"] = ""
+
                     break
 
             create_audit_log(
                 user_name=approved_by,
                 action="Reactivation Approved",
                 related_entity=f"user: {request.get('email')}",
-                details="User account reactivated",
+                details="User reactivation request approved",
+                company=company
+            )
+
+            create_audit_log(
+                user_name=approved_by,
+                action="User Activated",
+                related_entity=f"user: {request.get('email')}",
+                details="User account activated again",
                 company=company
             )
 

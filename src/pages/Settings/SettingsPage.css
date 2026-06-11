@@ -262,3 +262,59 @@ background:#dc2626 !important;
 color:white !important;
 
 }
+.request-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.request-card p {
+  margin: 6px 0;
+  color: #334155;
+  font-size: 14px;
+}
+
+.request-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn,
+.reject-btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.approve-btn {
+  background: #22c55e;
+  color: white;
+}
+
+.reject-btn {
+  background: #ef4444;
+  color: white;
+}
+
+/* DARK MODE */
+
+body.dark-theme .request-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+body.dark-theme .request-card p {
+  color: #e5e7eb;
+}
+
+body.dark-theme .request-card strong {
+  color: white;
+}

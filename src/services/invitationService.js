@@ -108,7 +108,7 @@ return response.data;
 // SUBMIT REACTIVATION REQUEST
 
 export const submitReactivationRequestApi =
-async()=>{
+async(reactivationMessage)=>{
 
 const response =
 await axios.post(
@@ -116,14 +116,15 @@ await axios.post(
 {
 email:localStorage.getItem("email"),
 company:getCompany(),
-requestedBy:localStorage.getItem("email")
+requestedBy:localStorage.getItem("email"),
+deactivatedBy:localStorage.getItem("deactivatedBy") || "",
+message:reactivationMessage
 }
 );
 
 return response.data;
 
 };
-
 
 // GET REACTIVATION REQUESTS
 

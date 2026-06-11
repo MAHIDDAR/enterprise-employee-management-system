@@ -8,10 +8,7 @@ createInvitationApi,
 getInvitationsApi,
 revokeInvitationApi,
 getMembersApi,
-deactivateUserApi,
-getReactivationRequestsApi,
-approveReactivationApi,
-rejectReactivationApi
+deactivateUserApi
 } from "../../services/invitationService";
 
 import "./InvitationsPage.css";
@@ -39,11 +36,6 @@ useState([]);
 const [members,setMembers] =
 useState([]);
 
-const [
-reactivationRequests,
-setReactivationRequests
-] = useState([]);
-
 useEffect(()=>{
 
 loadData();
@@ -61,14 +53,9 @@ await getInvitationsApi();
 const memberData =
 await getMembersApi();
 
-const requestData =
-await getReactivationRequestsApi();
-
 setInvitations(invitationData);
 
 setMembers(memberData);
-
-setReactivationRequests(requestData);
 
 }
 
@@ -154,24 +141,6 @@ loadData();
 
 };
 
-const approveRequest =
-async(id)=>{
-
-await approveReactivationApi(id);
-
-loadData();
-
-};
-
-const rejectRequest =
-async(id)=>{
-
-await rejectReactivationApi(id);
-
-loadData();
-
-};
-
 if(role !== "admin"){
 
 return(
@@ -197,7 +166,7 @@ return(
 <h1>User Invitations & Members</h1>
 
 <p>
-Manage invitations, members, deactivation and reactivation for {company}
+Manage invitations, members and deactivation for {company}
 </p>
 
 </div>
@@ -324,6 +293,8 @@ Revoke
 
 <th>Status</th>
 
+<th>Deactivated By</th>
+
 <th>Action</th>
 
 </tr>
@@ -344,6 +315,16 @@ members.map((member,index)=>(
 <td>{member.role}</td>
 
 <td>{member.status}</td>
+
+<td>
+{
+member.deactivatedBy
+?
+member.deactivatedBy
+:
+"-"
+}
+</td>
 
 <td>
 
@@ -376,62 +357,6 @@ Deactivate
 </table>
 
 </div>
-
-</div>
-
-<div className="invitation-card full-card">
-
-<h2>Reactivation Requests</h2>
-
-{
-reactivationRequests.filter(
-request => request.status === "pending"
-).length === 0
-?
-<p>No reactivation requests</p>
-:
-reactivationRequests
-.filter(request => request.status === "pending")
-.map(request=>(
-
-<div
-key={request.id}
-className="invitation-row"
->
-
-<div>
-
-<h3>{request.email}</h3>
-
-<p>Status: {request.status}</p>
-
-</div>
-
-<div className="invitation-actions">
-
-<button
-onClick={()=>
-approveRequest(request.id)
-}
->
-Approve
-</button>
-
-<button
-className="danger-btn"
-onClick={()=>
-rejectRequest(request.id)
-}
->
-Reject
-</button>
-
-</div>
-
-</div>
-
-))
-}
 
 </div>
 

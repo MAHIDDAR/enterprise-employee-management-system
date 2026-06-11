@@ -41,3 +41,13 @@ color:white;
 color:white;
 
 }
+.card-description {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+body.dark-theme .card-description {
+  color: #cbd5e1;
+}
