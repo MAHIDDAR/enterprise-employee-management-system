@@ -1,5 +1,6 @@
 import {
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -20,6 +21,19 @@ import {
 import {
   EmployeeContext,
 } from "../../context/EmployeeContext";
+
+import {
+  getCurrentUserApi,
+} from "../../services/authService";
+
+import {
+  getAttendanceAccessRequestsApi,
+  approveAttendanceAccessApi,
+  rejectAttendanceAccessApi,
+  getLeaveRequestsApi,
+  approveLeaveRequestApi,
+  rejectLeaveRequestApi,
+} from "../../services/attendanceService";
 
 import "./Navbar.css";
 
@@ -44,6 +58,13 @@ function Navbar({ toggleSidebar }) {
   );
 
   const [
+    currentRole,
+    setCurrentRole,
+  ] = useState(
+    localStorage.getItem("role")
+  );
+
+  const [
     showNotifications,
     setShowNotifications,
   ] = useState(false);
@@ -53,6 +74,153 @@ function Navbar({ toggleSidebar }) {
     setShowProfileMenu,
   ] = useState(false);
 
+  const [
+    attendanceAccessRequests,
+    setAttendanceAccessRequests,
+  ] = useState([]);
+
+  const [
+    leaveRequests,
+    setLeaveRequests,
+  ] = useState([]);
+
+  const loadAdminNotifications =
+  async () => {
+
+    try {
+
+      const accessData =
+      await getAttendanceAccessRequestsApi();
+
+      const pendingAccess =
+      accessData.filter(
+        (request) =>
+          request.status === "pending"
+      );
+
+      setAttendanceAccessRequests(
+        pendingAccess
+      );
+
+      const leaveData =
+      await getLeaveRequestsApi();
+
+      const pendingLeaves =
+      leaveData.filter(
+        (request) =>
+          request.status === "pending"
+      );
+
+      setLeaveRequests(
+        pendingLeaves
+      );
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  const syncCurrentUserRole =
+  async () => {
+
+    try {
+
+      const data =
+      await getCurrentUserApi();
+
+      if (data.role) {
+
+        localStorage.setItem(
+          "role",
+          data.role
+        );
+
+        setCurrentRole(
+          data.role
+        );
+
+        if (data.role === "admin") {
+
+          loadAdminNotifications();
+
+        }
+        else {
+
+          setAttendanceAccessRequests([]);
+
+          setLeaveRequests([]);
+
+        }
+
+      }
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  useEffect(() => {
+
+    syncCurrentUserRole();
+
+    const interval =
+    setInterval(() => {
+
+      syncCurrentUserRole();
+
+    }, 2000);
+
+    return () =>
+      clearInterval(interval);
+
+  }, []);
+
+  const handleApproveAttendance =
+  async (id) => {
+
+    await approveAttendanceAccessApi(id);
+
+    loadAdminNotifications();
+
+  };
+
+  const handleRejectAttendance =
+  async (id) => {
+
+    await rejectAttendanceAccessApi(id);
+
+    loadAdminNotifications();
+
+  };
+
+  const handleApproveLeave =
+  async (id) => {
+
+    await approveLeaveRequestApi(id);
+
+    loadAdminNotifications();
+
+  };
+
+  const handleRejectLeave =
+  async (id) => {
+
+    await rejectLeaveRequestApi(id);
+
+    loadAdminNotifications();
+
+  };
+
   const handleLogout = () => {
 
     localStorage.clear();
@@ -60,6 +228,16 @@ function Navbar({ toggleSidebar }) {
     navigate("/");
 
   };
+
+  const adminRequestCount =
+    attendanceAccessRequests.length
+    +
+    leaveRequests.length;
+
+  const totalNotificationCount =
+    unreadCount
+    +
+    adminRequestCount;
 
   return (
 
@@ -105,14 +283,22 @@ function Navbar({ toggleSidebar }) {
 
               clearNotifications();
 
+              syncCurrentUserRole();
+
+              if (currentRole === "admin") {
+
+                loadAdminNotifications();
+
+              }
+
             }}
           >
             🔔
 
-            {unreadCount > 0 && (
+            {totalNotificationCount > 0 && (
 
               <span className="notification-count">
-                {unreadCount}
+                {totalNotificationCount}
               </span>
 
             )}
@@ -127,28 +313,163 @@ function Navbar({ toggleSidebar }) {
                 Notifications
               </h4>
 
-              {notifications.length === 0 ? (
+              {
+                notifications.length === 0
+                &&
+                attendanceAccessRequests.length === 0
+                &&
+                leaveRequests.length === 0
+                ? (
 
-                <p>
-                  No Notifications
-                </p>
+                  <p>
+                    No Notifications
+                  </p>
 
-              ) : (
+                ) : (
 
-                notifications.map(
-                  (notification) => (
+                  <>
 
-                    <div
-                      key={notification.id}
-                      className="notification-item"
-                    >
-                      {notification.text}
-                    </div>
+                    {
+                      notifications.map(
+                        (notification, index) => (
 
-                  )
+                          <div
+                            key={notification.id || index}
+                            className="notification-item"
+                          >
+                            {notification.text || notification.message || notification}
+                          </div>
+
+                        )
+                      )
+                    }
+
+                    {
+                      currentRole === "admin"
+                      &&
+                      attendanceAccessRequests.map(
+                        (request) => (
+
+                          <div
+                            key={`attendance-${request.id}`}
+                            className="notification-item notification-action-item"
+                          >
+
+                            <strong>
+                              Attendance Access Request
+                            </strong>
+
+                            <p>
+                              User: {request.name || request.email}
+                            </p>
+
+                            <p>
+                              Email: {request.email}
+                            </p>
+
+                            <p>
+                              Submitted: {request.submittedAt || "Just now"}
+                            </p>
+
+                            <div className="notification-actions">
+
+                              <button
+                                className="approve-btn"
+                                onClick={() =>
+                                  handleApproveAttendance(
+                                    request.id
+                                  )
+                                }
+                              >
+                                Approve
+                              </button>
+
+                              <button
+                                className="reject-btn"
+                                onClick={() =>
+                                  handleRejectAttendance(
+                                    request.id
+                                  )
+                                }
+                              >
+                                Reject
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                        )
+                      )
+                    }
+
+                    {
+                      currentRole === "admin"
+                      &&
+                      leaveRequests.map(
+                        (request) => (
+
+                          <div
+                            key={`leave-${request.id}`}
+                            className="notification-item notification-action-item"
+                          >
+
+                            <strong>
+                              Leave Request
+                            </strong>
+
+                            <p>
+                              Email: {request.email}
+                            </p>
+
+                            <p>
+                              Type: {request.leaveType}
+                            </p>
+
+                            <p>
+                              Dates: {request.startDate} to {request.endDate}
+                            </p>
+
+                            <p>
+                              Reason: {request.reason}
+                            </p>
+
+                            <div className="notification-actions">
+
+                              <button
+                                className="approve-btn"
+                                onClick={() =>
+                                  handleApproveLeave(
+                                    request.id
+                                  )
+                                }
+                              >
+                                Approve
+                              </button>
+
+                              <button
+                                className="reject-btn"
+                                onClick={() =>
+                                  handleRejectLeave(
+                                    request.id
+                                  )
+                                }
+                              >
+                                Reject
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                        )
+                      )
+                    }
+
+                  </>
+
                 )
-
-              )}
+              }
 
             </div>
 
@@ -169,9 +490,7 @@ function Navbar({ toggleSidebar }) {
           >
 
             {
-              localStorage.getItem(
-                "role"
-              ) === "admin"
+              currentRole === "admin"
                 ? "Admin User"
                 : "Normal User"
             }

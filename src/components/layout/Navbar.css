@@ -448,3 +448,43 @@ body.dark-theme .navbar-profile-menu {
 body.dark-theme .navbar-profile-menu p {
   color: #cbd5e1;
 }
+.notification-action-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notification-action-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #475569;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.notification-actions .approve-btn,
+.notification-actions .reject-btn {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.notification-actions .approve-btn {
+  background: #22c55e;
+}
+
+.notification-actions .reject-btn {
+  background: #ef4444;
+}
+
+body.dark-theme .notification-action-item p {
+  color: #cbd5e1;
+}

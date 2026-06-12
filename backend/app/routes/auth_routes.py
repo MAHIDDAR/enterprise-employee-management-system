@@ -275,3 +275,26 @@ def forgot_password(user: dict):
         "message": "User Not Found"
 
     }
+@auth_router.get("/current-user")
+def get_current_user(
+    email: str,
+    company: str = "Stackly"
+):
+
+    company = normalize_company(company)
+
+    for user in users:
+
+        if user["email"].lower() == email.lower() and normalize_company(user.get("company")) == company:
+
+            return {
+                "email": user["email"],
+                "role": user.get("role", "user"),
+                "company": user.get("company", company),
+                "accountStatus": user.get("status", "Active"),
+                "reactivationStatus": user.get("reactivationStatus", "Not Requested")
+            }
+
+    return {
+        "message": "User Not Found"
+    }

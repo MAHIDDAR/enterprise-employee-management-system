@@ -147,3 +147,19 @@ await axios.get(
 return response.data;
 
 };
+export const getCurrentUserApi = async()=>{
+
+const email =
+localStorage.getItem("email");
+
+const company =
+localStorage.getItem("company") || "Stackly";
+
+const response =
+await axios.get(
+`${BASE_URL}/current-user?email=${email}&company=${company}`
+);
+
+return response.data;
+
+};

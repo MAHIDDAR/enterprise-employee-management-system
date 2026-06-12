@@ -4,11 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database.database import Base
 from app.database.database import engine
 
+
 # IMPORT MODELS
 from app.models.employee_model import Employee
 from app.models.company_model import Company
 from app.models.audit_log_model import AuditLog
 from app.models.invitation_model import Invitation
+
 
 # IMPORT ROUTES
 from app.routes.employee_routes import router
@@ -17,6 +19,7 @@ from app.routes.request_routes import request_router
 from app.routes.audit_routes import audit_router
 from app.routes.analytics_routes import analytics_router
 from app.routes.invitation_routes import invitation_router
+from app.routes.attendance_routes import attendance_router
 
 
 # CREATE DATABASE TABLES
@@ -54,6 +57,8 @@ app.include_router(audit_router)
 app.include_router(analytics_router)
 
 app.include_router(invitation_router)
+
+app.include_router(attendance_router)
 
 
 @app.get("/")

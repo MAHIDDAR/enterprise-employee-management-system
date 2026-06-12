@@ -22,6 +22,12 @@ rejectReactivationApi
 } from "../../services/invitationService";
 
 import {
+getLeaveRequestsApi,
+approveLeaveRequestApi,
+rejectLeaveRequestApi
+} from "../../services/attendanceService";
+
+import {
 ThemeContext
 } from "../../context/ThemeContext";
 
@@ -63,6 +69,11 @@ reactivationRequests,
 setReactivationRequests
 ] = useState([]);
 
+const [
+leaveRequests,
+setLeaveRequests
+] = useState([]);
+
 useEffect(()=>{
 
 if(role==="admin"){
@@ -70,6 +81,8 @@ if(role==="admin"){
 loadRequests();
 
 loadReactivationRequests();
+
+loadLeaveRequests();
 
 }
 
@@ -111,6 +124,34 @@ request.status === "pending"
 );
 
 setReactivationRequests(
+pendingData
+);
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const loadLeaveRequests =
+async()=>{
+
+try{
+
+const data =
+await getLeaveRequestsApi();
+
+const pendingData =
+data.filter(
+(request)=>
+request.status === "pending"
+);
+
+setLeaveRequests(
 pendingData
 );
 
@@ -277,6 +318,44 @@ await rejectReactivationApi(id);
 loadReactivationRequests();
 
 loadRequests();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const approveLeave =
+async(id)=>{
+
+try{
+
+await approveLeaveRequestApi(id);
+
+loadLeaveRequests();
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const rejectLeave =
+async(id)=>{
+
+try{
+
+await rejectLeaveRequestApi(id);
+
+loadLeaveRequests();
 
 }
 
@@ -760,7 +839,7 @@ Deactivated By:
 
 {" "}
 
-{request.deactivatedBy || "Company Admin"}
+{request.deactivatedBy || "Not Available"}
 
 </p>
 
@@ -809,6 +888,192 @@ className="reject-btn"
 onClick={()=>{
 
 rejectReactivation(
+
+request.id
+
+)
+
+}}
+
+>
+
+Reject
+
+</button>
+
+</div>
+
+</div>
+
+)
+
+)
+
+}
+
+</div>
+
+}
+
+{/* ADMIN LEAVE REQUESTS */}
+
+{
+
+role==="admin"
+
+&&
+
+<div className="settings-card">
+
+<h2>
+
+Leave Requests
+
+</h2>
+
+{
+
+leaveRequests.length===0
+
+?
+
+<p>
+
+No Leave Requests
+
+</p>
+
+:
+
+leaveRequests.map(
+
+(request)=>(
+
+<div
+
+key={request.id}
+
+className="request-card"
+
+>
+
+<div>
+
+<p>
+
+<strong>
+
+User Email:
+
+</strong>
+
+{" "}
+
+{request.email}
+
+</p>
+
+<p>
+
+<strong>
+
+Leave Type:
+
+</strong>
+
+{" "}
+
+{request.leaveType}
+
+</p>
+
+<p>
+
+<strong>
+
+Dates:
+
+</strong>
+
+{" "}
+
+{request.startDate} to {request.endDate}
+
+</p>
+
+<p>
+
+<strong>
+
+Reason:
+
+</strong>
+
+{" "}
+
+{request.reason}
+
+</p>
+
+<p>
+
+<strong>
+
+Company:
+
+</strong>
+
+{" "}
+
+{request.company}
+
+</p>
+
+<p>
+
+<strong>
+
+Status:
+
+</strong>
+
+{" "}
+
+{request.status}
+
+</p>
+
+</div>
+
+<div className="request-buttons">
+
+<button
+
+className="approve-btn"
+
+onClick={()=>{
+
+approveLeave(
+
+request.id
+
+)
+
+}}
+
+>
+
+Approve
+
+</button>
+
+<button
+
+className="reject-btn"
+
+onClick={()=>{
+
+rejectLeave(
 
 request.id
 

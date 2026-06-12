@@ -57,6 +57,12 @@ function Sidebar() {
       name:"Employees",
       path:"/employees",
       icon:<FaUsers/>
+    },
+
+    {
+      name:"Attendance",
+      path:"/attendance",
+      icon:<FaCalendarCheck/>
     }
 
   ];
@@ -84,14 +90,6 @@ function Sidebar() {
       name:"Departments",
       path:"/departments",
       icon:<FaBuilding/>
-
-    });
-
-    menuItems.push({
-
-      name:"Attendance",
-      path:"/attendance",
-      icon:<FaCalendarCheck/>
 
     });
 

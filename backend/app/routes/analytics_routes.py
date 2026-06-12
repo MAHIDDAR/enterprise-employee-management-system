@@ -7,6 +7,8 @@ from app.routes.request_routes import requests_db
 from app.routes.auth_routes import users
 from app.routes.auth_routes import normalize_company
 from app.routes.invitation_routes import get_pending_reactivation_count
+from app.routes.attendance_routes import attendance_access_requests
+from app.routes.attendance_routes import leave_requests
 
 
 analytics_router = APIRouter(
@@ -55,10 +57,26 @@ def get_dashboard_analytics(company: str = "Stackly"):
         company
     )
 
+    pending_attendance_access_requests = len([
+        request for request in attendance_access_requests
+        if request.get("company") == company
+        and request.get("status") == "pending"
+    ])
+
+    pending_leave_requests = len([
+        request for request in leave_requests
+        if request.get("company") == company
+        and request.get("status") == "pending"
+    ])
+
     pending_requests = (
         pending_role_requests
         +
         pending_reactivation_requests
+        +
+        pending_attendance_access_requests
+        +
+        pending_leave_requests
     )
 
     db.close()
@@ -75,7 +93,11 @@ def get_dashboard_analytics(company: str = "Stackly"):
 
         "pendingRoleRequests": pending_role_requests,
 
-        "pendingReactivationRequests": pending_reactivation_requests
+        "pendingReactivationRequests": pending_reactivation_requests,
+
+        "pendingAttendanceAccessRequests": pending_attendance_access_requests,
+
+        "pendingLeaveRequests": pending_leave_requests
 
     }
 

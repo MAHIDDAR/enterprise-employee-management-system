@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 
+import json
+import urllib.request
+
 from app.database.database import SessionLocal
 
 from app.models.employee_model import Employee
@@ -13,6 +16,67 @@ router = APIRouter(
 )
 
 
+# FETCH EMPLOYEES FROM API
+
+def fetch_api_employees(company: str):
+
+    api_url = "https://jsonplaceholder.typicode.com/users"
+
+    with urllib.request.urlopen(api_url) as response:
+
+        api_data = response.read()
+
+        users = json.loads(api_data)
+
+    departments = [
+        "Development",
+        "HR",
+        "Testing",
+        "Support",
+        "Finance",
+        "Marketing",
+        "Operations",
+        "Sales",
+        "Design",
+        "Management"
+    ]
+
+    statuses = [
+        "Active",
+        "Inactive",
+        "On Leave"
+    ]
+
+    if company.lower() == "stackly":
+
+        selected_users = users[:5]
+
+    elif company.lower() == "tcs":
+
+        selected_users = users[5:10]
+
+    else:
+
+        selected_users = users[:3]
+
+    employees = []
+
+    for index, user in enumerate(selected_users):
+
+        employee = {
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "department": departments[index % len(departments)],
+            "city": user.get("address", {}).get("city", "Hyderabad"),
+            "phone": user.get("phone"),
+            "status": statuses[index % len(statuses)]
+        }
+
+        employees.append(employee)
+
+    return employees
+
+
 # GET EMPLOYEES BY COMPANY
 
 @router.get("/")
@@ -24,73 +88,14 @@ def get_employees(company: str = "Stackly"):
         Employee.company == company
     ).all()
 
-    # SAMPLE DATA COMPANY WISE
+    # IF COMPANY EMPLOYEES ARE NOT PRESENT IN DB, FETCH FROM API
     if len(employees) == 0:
 
-        if company.lower() == "stackly":
+        api_employees = fetch_api_employees(
+            company
+        )
 
-            sample_employees = [
-
-                {
-                    "name": "Stackly Employee One",
-                    "email": "stackly1@gmail.com",
-                    "department": "Development",
-                    "city": "Hyderabad",
-                    "phone": "9999999991",
-                    "status": "Active"
-                },
-
-                {
-                    "name": "Stackly Employee Two",
-                    "email": "stackly2@gmail.com",
-                    "department": "HR",
-                    "city": "Hyderabad",
-                    "phone": "9999999992",
-                    "status": "Inactive"
-                }
-
-            ]
-
-        elif company.lower() == "tcs":
-
-            sample_employees = [
-
-                {
-                    "name": "TCS Employee One",
-                    "email": "tcs1@gmail.com",
-                    "department": "Testing",
-                    "city": "Chennai",
-                    "phone": "8888888881",
-                    "status": "Active"
-                },
-
-                {
-                    "name": "TCS Employee Two",
-                    "email": "tcs2@gmail.com",
-                    "department": "Support",
-                    "city": "Bangalore",
-                    "phone": "8888888882",
-                    "status": "On Leave"
-                }
-
-            ]
-
-        else:
-
-            sample_employees = [
-
-                {
-                    "name": f"{company} Employee One",
-                    "email": f"{company.lower()}1@gmail.com",
-                    "department": "General",
-                    "city": "Hyderabad",
-                    "phone": "7777777771",
-                    "status": "Active"
-                }
-
-            ]
-
-        for employee in sample_employees:
+        for employee in api_employees:
 
             new_employee = Employee(
                 name=employee["name"],
@@ -130,7 +135,6 @@ def get_employees(company: str = "Stackly"):
     return result
 
 
-# ADD EMPLOYEE
 # ADD EMPLOYEE
 
 @router.post("/")
@@ -187,6 +191,7 @@ def add_employee(employee: dict):
     return {
         "message": "Employee Added Successfully"
     }
+
 
 # UPDATE EMPLOYEE
 
