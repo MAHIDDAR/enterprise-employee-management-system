@@ -67,11 +67,13 @@ function EmployeeProvider({
   };
 
   // CLEAR UNREAD COUNT
-  const clearNotifications =
-    () => {
+const clearNotifications = () => {
 
-      setUnreadCount(0);
-    };
+  setNotifications([]);
+
+  setUnreadCount(0);
+
+};
 
   return (
 

@@ -28,3 +28,11 @@ class Employee(Base):
     company = Column(String)
 
     status = Column(String, default="Active")
+
+    role = Column(String, default="Employee")
+
+    joined_date = Column(String)
+
+    reporting_manager_id = Column(Integer, nullable=True)
+
+    reporting_manager_name = Column(String, nullable=True)

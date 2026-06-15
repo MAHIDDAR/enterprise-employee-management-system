@@ -8,67 +8,75 @@ useNavigate
 
 import {
 FaEye,
-FaEyeSlash
+FaEyeSlash,
+FaEnvelope,
+FaLock,
+FaUserFriends
 } from "react-icons/fa";
 
 import {
 loginApi
 } from "../../services/authService";
 
+import {
+createAttendanceAccessRequestApi
+} from "../../services/attendanceService";
+
 import "./LoginPage.css";
 
 function LoginPage(){
 
-const navigate=
+const navigate =
 useNavigate();
 
-const[
+const [
 showPassword,
 setShowPassword
-]=useState(true);
+] = useState(false);
 
-const[
+const [
+rememberMe,
+setRememberMe
+] = useState(false);
+
+const [
 formData,
 setFormData
-]=useState({
+] = useState({
 
 email:"",
 
-password:"",
-
-role:"",
-
-company:""
+password:""
 
 });
 
-const[
+const [
 error,
 setError
-]=useState("");
+] = useState("");
 
-const[
+const [
 loading,
 setLoading
-]=useState(false);
+] = useState(false);
 
-const handleChange=(e)=>{
+const handleChange = (event)=>{
 
 setFormData({
 
 ...formData,
 
-[e.target.name]:
-e.target.value
+[event.target.name]:
+event.target.value
 
 });
 
 };
 
-const handleSubmit=
-async(e)=>{
+const handleSubmit =
+async(event)=>{
 
-e.preventDefault();
+event.preventDefault();
 
 setError("");
 
@@ -76,87 +84,76 @@ try{
 
 setLoading(true);
 
-const response=
-await loginApi(
-formData
-);
+const response =
+await loginApi({
+
+email:formData.email,
+
+password:formData.password
+
+});
 
 if(
-
-response.message===
-"Login Successful"
-
+response.message === "Login Successful"
 ){
 
 localStorage.setItem(
-
 "role",
-
 response.role
-
 );
 
 localStorage.setItem(
-
 "company",
-
 response.company
-
 );
 
 localStorage.setItem(
-
 "token",
-
 response.token
-
 );
 
 localStorage.setItem(
-
 "isLoggedIn",
-
 true
-
 );
 
 localStorage.setItem(
-
 "email",
-
-formData.email
-
+response.email || formData.email
 );
 
 localStorage.setItem(
-
 "accountStatus",
-
 response.accountStatus || "Active"
-
 );
 
 localStorage.setItem(
-
 "reactivationStatus",
-
 response.reactivationStatus || "Not Requested"
-
 );
 
 localStorage.setItem(
-
 "deactivatedBy",
-
 response.deactivatedBy || ""
-
 );
+
+if(response.role === "user"){
+
+try{
+
+await createAttendanceAccessRequestApi();
+
+}
+catch(error){
+
+console.log(error);
+
+}
+
+}
 
 if(
-
-response.accountStatus ===
-"Deactivated"
-
+response.accountStatus === "Deactivated"
 ){
 
 navigate(
@@ -164,7 +161,6 @@ navigate(
 );
 
 }
-
 else{
 
 navigate(
@@ -174,7 +170,6 @@ navigate(
 }
 
 }
-
 else{
 
 setError(
@@ -184,15 +179,15 @@ setError(
 }
 
 }
+catch(error){
 
-catch{
+console.log(error);
 
 setError(
 "Login Failed"
 );
 
 }
-
 finally{
 
 setLoading(false);
@@ -206,251 +201,175 @@ return(
 <div className="login-page">
 
 <form
-
 className="login-form"
-
-onSubmit={
-handleSubmit
-}
-
+onSubmit={handleSubmit}
 >
+
+<div className="login-icon">
+
+<FaUserFriends/>
+
+</div>
 
 <h2>
 
-Employee Management Login
+Welcome Back!
 
 </h2>
 
-{/* COMPANY */}
+<p className="login-subtitle">
 
-<select
+Login to your account
 
-name="company"
+</p>
 
-value={
-formData.company
-}
+<div className="form-group">
 
-onChange={
-handleChange
-}
+<label>
 
-required
+Email
 
->
+</label>
 
-<option value="">
+<div className="input-wrapper">
 
-Select Company
-
-</option>
-
-<option value="Stackly">
-
-Stackly
-
-</option>
-
-<option value="TCS">
-
-TCS
-
-</option>
-
-</select>
-
-{/* ROLE */}
-
-<select
-
-name="role"
-
-value={
-formData.role
-}
-
-onChange={
-handleChange
-}
-
-required
-
->
-
-<option value="">
-
-Select Role
-
-</option>
-
-<option value="admin">
-
-Admin
-
-</option>
-
-<option value="user">
-
-User
-
-</option>
-
-</select>
+<FaEnvelope className="input-icon"/>
 
 <input
-
 type="email"
-
 name="email"
-
-placeholder="Enter Email"
-
-value={
-formData.email
-}
-
-onChange={
-handleChange
-}
-
+placeholder="Enter your email"
+value={formData.email}
+onChange={handleChange}
 required
-
 />
 
-<div className="password-wrapper">
+</div>
+
+</div>
+
+<div className="form-group">
+
+<label>
+
+Password
+
+</label>
+
+<div className="input-wrapper">
+
+<FaLock className="input-icon"/>
 
 <input
-
 type={
-
 showPassword
-
 ?
-
-"password"
-
-:
-
 "text"
-
+:
+"password"
 }
-
 name="password"
-
-placeholder="Enter Password"
-
+placeholder="Enter your password"
 value={formData.password}
-
 onChange={handleChange}
-
 required
-
 />
 
 <span
-
 className="eye-icon"
-
 onClick={()=>{
 
 setShowPassword(
-
 !showPassword
-
-)
+);
 
 }}
-
 >
 
 {
-
 showPassword
-
 ?
-
-<FaEyeSlash/>
-
-:
-
 <FaEye/>
-
+:
+<FaEyeSlash/>
 }
 
 </span>
 
 </div>
 
-<button
+</div>
 
-type="submit"
+<div className="login-options">
 
-disabled={loading}
+<label className="remember-box">
 
->
+<input
+type="checkbox"
+checked={rememberMe}
+onChange={()=>setRememberMe(!rememberMe)}
+/>
 
-{
+Remember me
 
-loading
-
-?
-
-"Logging In..."
-
-:
-
-"Login"
-
-}
-
-</button>
-
-<div className="auth-links">
+</label>
 
 <button
-
 type="button"
-
-className="secondary-btn"
-
+className="forgot-btn"
 onClick={()=>{
 
 navigate(
 "/forgot-password"
-)
+);
 
 }}
-
 >
 
-Forgot Password?
+Forgot password?
 
 </button>
 
+</div>
+
 <button
+type="submit"
+className="login-btn"
+disabled={loading}
+>
 
+{
+loading
+?
+"Logging In..."
+:
+"Login"
+}
+
+</button>
+
+<div className="signup-text">
+
+Don't have an account?
+
+<button
 type="button"
-
-className="secondary-btn"
-
 onClick={()=>{
 
 navigate(
 "/signup"
-)
+);
 
 }}
-
 >
 
-Sign Up
+Sign up
 
 </button>
 
 </div>
 
 {
-
 error && (
 
 <p className="error-text">

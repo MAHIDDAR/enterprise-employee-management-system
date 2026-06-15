@@ -9,6 +9,7 @@ import ForgotPasswordPage from "../pages/ForgotPassword/ForgotPassword";
 
 import DashboardPage from "../pages/Dashboard/DashboardPage";
 import EmployeesPage from "../pages/Employees/EmployeesPage";
+import EmployeeDetailsPage from "../pages/Employees/EmployeeDetailsPage";
 import DepartmentsPage from "../pages/Departments/DepartmentsPage";
 import CompanyPage from "../pages/Company/CompanyPage";
 import AttendancePage from "../pages/Attendance/AttendancePage";
@@ -22,7 +23,6 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 
-
 function AppRoutes() {
 
   return (
@@ -31,7 +31,6 @@ function AppRoutes() {
 
       <Routes>
 
-        {/* LOGIN */}
         <Route
           path="/"
           element={<LoginPage />}
@@ -42,18 +41,15 @@ function AppRoutes() {
           element={<SignupPage />}
         />
 
-        {/* FORGOT PASSWORD */}
         <Route
           path="/forgot-password"
           element={<ForgotPasswordPage />}
         />
 
-        {/* PROTECTED */}
         <Route
           element={<ProtectedRoute />}
         >
 
-          {/* DEACTIVATED ACCOUNT PAGE */}
           <Route
             path="/account-deactivated"
             element={<AccountDeactivatedPage />}
@@ -71,6 +67,11 @@ function AppRoutes() {
             <Route
               path="/employees"
               element={<EmployeesPage />}
+            />
+
+            <Route
+              path="/employees/:employeeId"
+              element={<EmployeeDetailsPage />}
             />
 
             <Route
@@ -110,7 +111,9 @@ function AppRoutes() {
       </Routes>
 
     </BrowserRouter>
+
   );
+
 }
 
 export default AppRoutes;

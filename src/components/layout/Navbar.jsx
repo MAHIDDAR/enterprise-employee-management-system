@@ -65,6 +65,13 @@ function Navbar({ toggleSidebar }) {
   );
 
   const [
+    currentCompany,
+    setCurrentCompany,
+  ] = useState(
+    localStorage.getItem("company") || "Company"
+  );
+
+  const [
     showNotifications,
     setShowNotifications,
   ] = useState(false);
@@ -140,8 +147,17 @@ function Navbar({ toggleSidebar }) {
           data.role
         );
 
+        localStorage.setItem(
+          "company",
+          data.company
+        );
+
         setCurrentRole(
           data.role
+        );
+
+        setCurrentCompany(
+          data.company
         );
 
         if (data.role === "admin") {
@@ -188,36 +204,85 @@ function Navbar({ toggleSidebar }) {
   const handleApproveAttendance =
   async (id) => {
 
+    setAttendanceAccessRequests(
+      attendanceAccessRequests.filter(
+        (request) =>
+          request.id !== id
+      )
+    );
+
     await approveAttendanceAccessApi(id);
 
-    loadAdminNotifications();
+    await loadAdminNotifications();
 
   };
 
   const handleRejectAttendance =
   async (id) => {
 
+    setAttendanceAccessRequests(
+      attendanceAccessRequests.filter(
+        (request) =>
+          request.id !== id
+      )
+    );
+
     await rejectAttendanceAccessApi(id);
 
-    loadAdminNotifications();
+    await loadAdminNotifications();
 
   };
 
   const handleApproveLeave =
   async (id) => {
 
+    setLeaveRequests(
+      leaveRequests.filter(
+        (request) =>
+          request.id !== id
+      )
+    );
+
     await approveLeaveRequestApi(id);
 
-    loadAdminNotifications();
+    await loadAdminNotifications();
 
   };
 
   const handleRejectLeave =
   async (id) => {
 
+    setLeaveRequests(
+      leaveRequests.filter(
+        (request) =>
+          request.id !== id
+      )
+    );
+
     await rejectLeaveRequestApi(id);
 
-    loadAdminNotifications();
+    await loadAdminNotifications();
+
+  };
+
+  const handleNotificationClick = () => {
+
+    const nextState =
+      !showNotifications;
+
+    setShowNotifications(
+      nextState
+    );
+
+    clearNotifications();
+
+    syncCurrentUserRole();
+
+    if (currentRole === "admin") {
+
+      loadAdminNotifications();
+
+    }
 
   };
 
@@ -252,11 +317,14 @@ function Navbar({ toggleSidebar }) {
           <FaBars />
         </button>
 
+        <div className="company-badge">
+          {currentCompany}
+        </div>
+
       </div>
 
       <div className="navbar-right">
 
-        {/* DARK / LIGHT BUTTON */}
         <button
           className="theme-btn"
           onClick={toggleTheme}
@@ -270,28 +338,11 @@ function Navbar({ toggleSidebar }) {
 
         </button>
 
-        {/* NOTIFICATION */}
         <div className="notification-wrapper">
 
           <button
             className="notification-btn"
-            onClick={() => {
-
-              setShowNotifications(
-                !showNotifications
-              );
-
-              clearNotifications();
-
-              syncCurrentUserRole();
-
-              if (currentRole === "admin") {
-
-                loadAdminNotifications();
-
-              }
-
-            }}
+            onClick={handleNotificationClick}
           >
             🔔
 
@@ -477,7 +528,6 @@ function Navbar({ toggleSidebar }) {
 
         </div>
 
-        {/* PROFILE WITH LOGOUT DROPDOWN */}
         <div className="navbar-profile-wrapper">
 
           <div
@@ -505,6 +555,10 @@ function Navbar({ toggleSidebar }) {
                 {localStorage.getItem("email")}
               </p>
 
+              <p>
+                Company: {currentCompany}
+              </p>
+
               <button
                 onClick={handleLogout}
               >
@@ -522,6 +576,7 @@ function Navbar({ toggleSidebar }) {
     </header>
 
   );
+
 }
 
 export default Navbar;

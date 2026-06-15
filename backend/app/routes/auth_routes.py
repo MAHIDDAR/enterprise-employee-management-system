@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from app.utils.jwt_handler import create_access_token
 
 
@@ -80,7 +81,7 @@ def signup(user: dict):
 
     email = user.get("email")
     password = user.get("password")
-    role = user.get("role")
+    role = user.get("role", "user")
     name = user.get("name")
     company = normalize_company(
         user.get("company")
@@ -115,16 +116,14 @@ def signup(user: dict):
 
 
 # LOGIN
+# LOGIN CHECKS EMAIL AND PASSWORD ONLY
+# ROLE AND COMPANY COME FROM BACKEND USER DATA
 
 @auth_router.post("/auth/login")
 def login(user: dict):
 
     email = user.get("email")
     password = user.get("password")
-    role = user.get("role")
-    company = normalize_company(
-        user.get("company")
-    )
 
     for existing_user in users:
 
@@ -140,21 +139,16 @@ def login(user: dict):
             ==
             password
 
-            and
+        ):
 
-            existing_user.get("role")
-            ==
-            role
-
-            and
-
-            normalize_company(
+            company = normalize_company(
                 existing_user.get("company")
             )
-            ==
-            company
 
-        ):
+            role = existing_user.get(
+                "role",
+                "user"
+            )
 
             account_status = existing_user.get(
                 "status",
@@ -175,7 +169,7 @@ def login(user: dict):
 
                 data={
 
-                    "email": email,
+                    "email": existing_user.get("email"),
                     "role": role,
                     "company": company,
                     "status": account_status
@@ -187,7 +181,9 @@ def login(user: dict):
             return {
 
                 "message": "Login Successful",
-                "role": existing_user["role"],
+                "email": existing_user.get("email"),
+                "name": existing_user.get("name"),
+                "role": role,
                 "company": company,
                 "accountStatus": account_status,
                 "reactivationStatus": reactivation_status,
@@ -200,6 +196,45 @@ def login(user: dict):
 
         "message": "Invalid Credentials"
 
+    }
+
+
+# GET CURRENT USER
+# USED BY NAVBAR TO CHECK LATEST ROLE AND COMPANY
+
+@auth_router.get("/auth/current-user")
+def get_current_user(
+    email: str,
+    company: str = "Stackly"
+):
+
+    company = normalize_company(company)
+
+    for user in users:
+
+        if (
+            user["email"].lower() == email.lower()
+            and
+            normalize_company(user.get("company")) == company
+        ):
+
+            return {
+                "email": user["email"],
+                "name": user.get("name"),
+                "role": user.get("role", "user"),
+                "company": normalize_company(
+                    user.get("company")
+                ),
+                "accountStatus": user.get("status", "Active"),
+                "reactivationStatus": user.get(
+                    "reactivationStatus",
+                    "Not Requested"
+                ),
+                "deactivatedBy": user.get("deactivatedBy", "")
+            }
+
+    return {
+        "message": "User Not Found"
     }
 
 
@@ -274,27 +309,4 @@ def forgot_password(user: dict):
 
         "message": "User Not Found"
 
-    }
-@auth_router.get("/current-user")
-def get_current_user(
-    email: str,
-    company: str = "Stackly"
-):
-
-    company = normalize_company(company)
-
-    for user in users:
-
-        if user["email"].lower() == email.lower() and normalize_company(user.get("company")) == company:
-
-            return {
-                "email": user["email"],
-                "role": user.get("role", "user"),
-                "company": user.get("company", company),
-                "accountStatus": user.get("status", "Active"),
-                "reactivationStatus": user.get("reactivationStatus", "Not Requested")
-            }
-
-    return {
-        "message": "User Not Found"
     }

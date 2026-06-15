@@ -5,6 +5,10 @@ import {
 } from "react";
 
 import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
   EmployeeContext,
 } from "../../context/EmployeeContext";
 
@@ -17,11 +21,15 @@ import {
   addEmployeeApi,
   updateEmployeeApi,
   deleteEmployeeApi,
+  fetchReportingManagersApi,
 } from "../../services/employeeService";
 
 import "./EmployeesPage.css";
 
 function EmployeesPage() {
+
+  const navigate =
+    useNavigate();
 
   const role =
     localStorage.getItem("role");
@@ -47,10 +55,11 @@ function EmployeesPage() {
 
   const [error, setError] =
     useState("");
-    const [
-  popupMessage,
-  setPopupMessage,
-] = useState("");
+
+  const [
+    popupMessage,
+    setPopupMessage,
+  ] = useState("");
 
   const [
     successMessage,
@@ -84,24 +93,32 @@ function EmployeesPage() {
   const [currentPage, setCurrentPage] =
     useState(1);
 
+  const [
+    reportingManagers,
+    setReportingManagers,
+  ] = useState([]);
+
   const employeesPerPage = 5;
 
   const [formData, setFormData] =
     useState({
       name: "",
       email: "",
+      role: "",
       department: "",
       city: "",
       phone: "",
       company: company,
       status: "Active",
+      joinedDate: "",
+      reportingManagerId: "",
     });
 
   useEffect(() => {
     loadEmployees();
+    loadReportingManagers();
   }, []);
 
-  // LOAD EMPLOYEES
   const loadEmployees = async () => {
 
     try {
@@ -126,10 +143,30 @@ function EmployeesPage() {
     } finally {
 
       setLoading(false);
+
     }
+
   };
 
-  // INPUT CHANGE
+  const loadReportingManagers = async () => {
+
+    try {
+
+      const data =
+        await fetchReportingManagersApi();
+
+      setReportingManagers(data);
+
+    } catch (error) {
+
+      console.log(error);
+
+      setReportingManagers([]);
+
+    }
+
+  };
+
   const handleChange = (event) => {
 
     setFormData({
@@ -137,14 +174,51 @@ function EmployeesPage() {
       [event.target.name]:
         event.target.value,
     });
+
   };
 
-  // ADD + UPDATE
-  const handleSubmit = async (
-    event
-  ) => {
+  const isEmployeeFormValid =
+    formData.name.trim() !== "" &&
+    formData.email.trim() !== "" &&
+    formData.role.trim() !== "" &&
+    formData.department.trim() !== "";
+
+  const resetForm = () => {
+
+    setFormData({
+      name: "",
+      email: "",
+      role: "",
+      department: "",
+      city: "",
+      phone: "",
+      company: company,
+      status: "Active",
+      joinedDate: "",
+      reportingManagerId: "",
+    });
+
+    setEditEmployeeId(null);
+
+  };
+
+  const openAddModal = () => {
+
+    if (!isAdmin) return;
+
+    resetForm();
+
+    loadReportingManagers();
+
+    setShowModal(true);
+
+  };
+
+  const handleSubmit = async (event) => {
 
     event.preventDefault();
+
+    if (!isEmployeeFormValid) return;
 
     const employeeData = {
       ...formData,
@@ -172,47 +246,42 @@ function EmployeesPage() {
       } else {
 
         const response =
-    await addEmployeeApi(
-      employeeData
-    );
+          await addEmployeeApi(
+            employeeData
+          );
 
-  if (
-    response.data.message ===
-    "Employee Already Exists"
-  ) {
+        if (
+          response.data.message ===
+          "Employee Already Exists"
+        ) {
 
-   setPopupMessage(
-  "Employee Already Exists"
-);
+          setPopupMessage(
+            "Employee Already Exists"
+          );
 
-setTimeout(() => {
-  setPopupMessage("");
-}, 3000);
-    return;
-  }
+          setTimeout(() => {
+            setPopupMessage("");
+          }, 3000);
 
-  addNotification(
-    `${formData.name} added`
-  );
+          return;
 
-  setSuccessMessage(
-    "Employee Added Successfully"
-  );
+        }
+
+        addNotification(
+          `${formData.name} added`
+        );
+
+        setSuccessMessage(
+          "Employee Added Successfully"
+        );
+
       }
 
       await loadEmployees();
 
-      setFormData({
-        name: "",
-        email: "",
-        department: "",
-        city: "",
-        phone: "",
-        company: company,
-        status: "Active",
-      });
+      await loadReportingManagers();
 
-      setEditEmployeeId(null);
+      resetForm();
 
       setShowModal(false);
 
@@ -227,37 +296,39 @@ setTimeout(() => {
       setError(
         "Something went wrong"
       );
+
     }
+
   };
 
-  // EDIT
-  const handleEdit = (
-    employee
-  ) => {
+  const handleEdit = (employee) => {
 
     if (!isAdmin) return;
 
     setFormData({
-      name: employee.name,
-      email: employee.email,
-      department:
-        employee.department,
-      city: employee.city,
-      phone: employee.phone,
-      company:
-        employee.company || company,
-      status:
-        employee.status || "Active",
+      name: employee.name || "",
+      email: employee.email || "",
+      role: employee.role || "",
+      department: employee.department || "",
+      city: employee.city || "",
+      phone: employee.phone || "",
+      company: employee.company || company,
+      status: employee.status || "Active",
+      joinedDate: employee.joinedDate || "",
+      reportingManagerId:
+        employee.reportingManagerId || "",
     });
 
     setEditEmployeeId(
       employee.id
     );
 
+    loadReportingManagers();
+
     setShowModal(true);
+
   };
 
-  // STATUS CHANGE
   const handleStatusChange = async (
     employee,
     newStatus
@@ -299,10 +370,11 @@ setTimeout(() => {
       setError(
         "Status Update Failed"
       );
+
     }
+
   };
 
-  // DELETE
   const handleDelete = async () => {
 
     try {
@@ -316,6 +388,8 @@ setTimeout(() => {
       );
 
       await loadEmployees();
+
+      await loadReportingManagers();
 
       setDeleteModal(false);
 
@@ -334,20 +408,42 @@ setTimeout(() => {
       setError(
         "Delete Failed"
       );
+
     }
+
   };
 
-  // FILTER
+  const openEmployeeDetails = (employee) => {
+
+    navigate(
+      `/employees/${employee.id}`
+    );
+
+  };
+
   const filteredEmployees =
     employees.filter((employee) => {
+
+      const searchText =
+        (searchValue || "")
+          .toLowerCase();
 
       const matchesSearch =
         (employee.name || "")
           .toLowerCase()
-          .includes(
-            (searchValue || "")
-              .toLowerCase()
-          );
+          .includes(searchText)
+        ||
+        (employee.email || "")
+          .toLowerCase()
+          .includes(searchText)
+        ||
+        (employee.department || "")
+          .toLowerCase()
+          .includes(searchText)
+        ||
+        (employee.role || "")
+          .toLowerCase()
+          .includes(searchText);
 
       const matchesDepartment =
         departmentFilter === "" ||
@@ -358,9 +454,9 @@ setTimeout(() => {
         matchesSearch &&
         matchesDepartment
       );
+
     });
 
-  // SORT
   const sortedEmployees = [
     ...filteredEmployees,
   ].sort((a, b) => {
@@ -370,6 +466,7 @@ setTimeout(() => {
       return a.name.localeCompare(
         b.name
       );
+
     }
 
     if (sortOrder === "desc") {
@@ -377,12 +474,13 @@ setTimeout(() => {
       return b.name.localeCompare(
         a.name
       );
+
     }
 
     return 0;
+
   });
 
-  // PAGINATION
   const lastIndex =
     currentPage * employeesPerPage;
 
@@ -395,19 +493,33 @@ setTimeout(() => {
       lastIndex
     );
 
-  const totalPages = Math.ceil(
-    sortedEmployees.length /
-      employeesPerPage
-  );
+  const totalPages =
+    Math.ceil(
+      sortedEmployees.length /
+        employeesPerPage
+    ) || 1;
+
+  const getInitials = (name) => {
+
+    if (!name) return "NA";
+
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+  };
 
   if (loading) {
 
     return (
       <div className="dashboard-message">
-        
         Loading employees...
       </div>
     );
+
   }
 
   if (error) {
@@ -417,33 +529,33 @@ setTimeout(() => {
         {error}
       </div>
     );
+
   }
 
   return (
 
     <div className="employees-page">
+
       {
-  popupMessage && (
+        popupMessage && (
 
-    <div className="popup-message error-popup">
+          <div className="popup-message error-popup">
+            {popupMessage}
+          </div>
 
-      {popupMessage}
+        )
+      }
 
-    </div>
-
-  )
-}
-
-      {/* HEADER */}
       <div className="employees-header">
 
         <div>
 
-          <h1>Employees</h1>
+          <h1>
+            Employees
+          </h1>
 
           <p>
-            Manage employee details
-            easily.
+            Manage employee records, roles, reporting managers and status.
           </p>
 
           <p>
@@ -460,49 +572,30 @@ setTimeout(() => {
               ? "Only Admin Can Perform This Action"
               : ""
           }
-          onClick={() => {
-
-            if (!isAdmin) return;
-
-            setShowModal(true);
-
-            setEditEmployeeId(null);
-
-            setFormData({
-              name: "",
-              email: "",
-              department: "",
-              city: "",
-              phone: "",
-              company: company,
-              status: "Active",
-            });
-          }}
+          onClick={openAddModal}
         >
           + Add Employee
         </button>
 
       </div>
 
-      {/* NORMAL USER MESSAGE */}
       {!isAdmin && (
 
         <div className="error-message">
           You are logged in as Normal User.
-          Add, Edit and Delete actions
-          are disabled.
+          Add, Edit and Delete actions are disabled.
         </div>
+
       )}
 
-      {/* SUCCESS MESSAGE */}
       {successMessage && (
 
         <div className="success-message">
           {successMessage}
         </div>
+
       )}
 
-      {/* FILTERS */}
       <div className="employee-controls">
 
         <select
@@ -539,6 +632,7 @@ setTimeout(() => {
               >
                 {department}
               </option>
+
             )
           )}
 
@@ -569,18 +663,31 @@ setTimeout(() => {
 
       </div>
 
-      {/* ADD / EDIT MODAL */}
       {showModal && (
 
         <div className="modal-overlay">
 
-          <div className="employee-modal">
+          <div className="employee-modal employee-modal-large">
 
-            <h2>
-              {editEmployeeId
-                ? "Edit Employee"
-                : "Add Employee"}
-            </h2>
+            <div className="modal-title-row">
+
+              <h2>
+                {editEmployeeId
+                  ? "Edit Employee"
+                  : "Add Employee"}
+              </h2>
+
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() =>
+                  setShowModal(false)
+                }
+              >
+                ×
+              </button>
+
+            </div>
 
             <form
               onSubmit={(event) => {
@@ -589,125 +696,213 @@ setTimeout(() => {
 
                 const confirmAction =
                   window.confirm(
-
                     editEmployeeId
                       ? "Are you sure you want to update this employee?"
                       : "Are you sure you want to add this employee?"
                   );
 
-                if (
-                  !confirmAction
-                )
-                  return;
+                if (!confirmAction) return;
 
                 handleSubmit(event);
+
               }}
             >
 
-              <input
-                type="text"
-                name="name"
-                placeholder="Employee Name"
-                required
-                value={formData.name}
-                onChange={
-                  handleChange
-                }
-              />
+              <div className="form-grid">
 
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                required
-                value={formData.email}
-                onChange={
-                  handleChange
-                }
-              />
+                <div className="form-group">
 
-              <input
-                type="text"
-                name="department"
-                placeholder="Enter Department"
-                required
-                value={formData.department}
-                onChange={handleChange}
-              />
+                  <label>
+                    Full Name *
+                  </label>
 
-              <input
-                type="text"
-                name="city"
-                placeholder="City"
-                required
-                value={formData.city}
-                onChange={
-                  handleChange
-                }
-              />
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Employee Name"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
 
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone"
-                required
-                value={formData.phone}
-                onChange={
-                  handleChange
-                }
-              />
+                </div>
 
-              <select
-                name="status"
-                required
-                value={formData.status}
-                onChange={handleChange}
-              >
+                <div className="form-group">
 
-                <option value="Active">
-                  Active
-                </option>
+                  <label>
+                    Email *
+                  </label>
 
-                <option value="Inactive">
-                  Inactive
-                </option>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
 
-                <option value="On Leave">
-                  On Leave
-                </option>
+                </div>
 
-              </select>
+                <div className="form-group">
+
+                  <label>
+                    Role *
+                  </label>
+
+                  <input
+                    type="text"
+                    name="role"
+                    placeholder="Example: Financial Analyst"
+                    value={formData.role}
+                    onChange={handleChange}
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Department *
+                  </label>
+
+                  <input
+                    type="text"
+                    name="department"
+                    placeholder="Enter Department"
+                    value={formData.department}
+                    onChange={handleChange}
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Phone Number
+                  </label>
+
+                  <input
+                    type="text"
+                    name="phone"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    City
+                  </label>
+
+                  <input
+                    type="text"
+                    name="city"
+                    placeholder="City"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Reporting Manager
+                  </label>
+
+                  <select
+                    name="reportingManagerId"
+                    value={formData.reportingManagerId}
+                    onChange={handleChange}
+                  >
+
+                    {
+                      reportingManagers.map(
+                        (manager) => (
+
+                          <option
+                            key={manager.id || "none"}
+                            value={manager.id}
+                          >
+                            {manager.label}
+                          </option>
+
+                        )
+                      )
+                    }
+
+                  </select>
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Joined Date
+                  </label>
+
+                  <input
+                    type="date"
+                    name="joinedDate"
+                    value={formData.joinedDate}
+                    onChange={handleChange}
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Status
+                  </label>
+
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+
+                    <option value="Active">
+                      Active
+                    </option>
+
+                    <option value="Inactive">
+                      Inactive
+                    </option>
+
+                    <option value="On Leave">
+                      On Leave
+                    </option>
+
+                  </select>
+
+                </div>
+
+              </div>
 
               <div className="modal-buttons">
 
-                <button
-                  type="submit"
-                  disabled={
-                    !formData.name.trim()
-                    ||
-                    !formData.email.trim()
-                    ||
-                    !formData.department.trim()
-                    ||
-                    !formData.city.trim()
-                    ||
-                    !formData.phone.trim()
-                  }
-                >
+                {
+                  isEmployeeFormValid && (
 
-                  {editEmployeeId
-                    ? "Update Employee"
-                    : "Add Employee"}
+                    <button
+                      type="submit"
+                    >
+                      {editEmployeeId
+                        ? "Update Employee"
+                        : "Add Employee"}
+                    </button>
 
-                </button>
+                  )
+                }
 
                 <button
                   type="button"
                   className="cancel-btn"
                   onClick={() =>
-                    setShowModal(
-                      false
-                    )
+                    setShowModal(false)
                   }
                 >
                   Cancel
@@ -720,162 +915,227 @@ setTimeout(() => {
           </div>
 
         </div>
+
       )}
 
-      {/* EMPLOYEE LIST */}
-      <div className="employee-list">
+      <div className="employees-table-card">
 
-        {currentEmployees.map(
-          (
-            employee,
-            index
-          ) => (
+        <table className="employees-table">
 
-            <div
-              key={
-                employee.id ||
-                index
-              }
-              className="employee-card"
-              id={`employee-${employee.id}`}
-            >
+          <thead>
 
-              <div className="employee-top">
+            <tr>
 
-                <div>
+              <th>
+                Employee
+              </th>
 
-                  <h3>
-                    {employee.name}
-                  </h3>
+              <th>
+                Role
+              </th>
 
-                  <p>
-                    {employee.email}
-                  </p>
+              <th>
+                Department
+              </th>
 
-                </div>
+              <th>
+                Status
+              </th>
 
-                <select
-                  className={`status-select ${
-                    (employee.status || "Active") === "Active"
-                      ? "active"
-                      : (employee.status || "Active") === "Inactive"
-                      ? "inactive"
-                      : "leave"
-                  }`}
-                  value={employee.status || "Active"}
-                  disabled={!isAdmin}
-                  onChange={(event) =>
-                    handleStatusChange(
-                      employee,
-                      event.target.value
-                    )
-                  }
-                >
+              <th>
+                Joined
+              </th>
 
-                  <option value="Active">
-                    Active
-                  </option>
+              <th>
+                Reporting Manager
+              </th>
 
-                  <option value="Inactive">
-                    Inactive
-                  </option>
+              <th>
+                Actions
+              </th>
 
-                  <option value="On Leave">
-                    On Leave
-                  </option>
+            </tr>
 
-                </select>
+          </thead>
 
-              </div>
+          <tbody>
 
-              <div className="employee-info">
+            {
+              currentEmployees.length === 0
+              ? (
 
-                <p>
-                  <strong>
-                    Department:
-                  </strong>{" "}
-                  {
-                    employee.department
-                  }
-                </p>
+                <tr>
+                  <td colSpan="7">
+                    No employees found
+                  </td>
+                </tr>
 
-                <p>
-                  <strong>
-                    City:
-                  </strong>{" "}
-                  {employee.city}
-                </p>
+              )
+              : (
 
-                <p>
-                  <strong>
-                    Phone:
-                  </strong>{" "}
-                  {employee.phone}
-                </p>
+                currentEmployees.map(
+                  (employee, index) => (
 
-                <p>
-                  <strong>
-                    Company:
-                  </strong>{" "}
-                  {employee.company || company}
-                </p>
+                    <tr
+                      key={
+                        employee.id ||
+                        index
+                      }
+                      onClick={() =>
+                        openEmployeeDetails(employee)
+                      }
+                      className="employee-table-row"
+                    >
 
-              </div>
+                      <td>
 
-              {/* ACTION BUTTONS */}
-              <div className="employee-actions">
+                        <div className="employee-cell">
 
-                <button
-                  className="edit-btn"
-                  disabled={!isAdmin}
-                  title={
-                    role !== "admin"
-                      ? "Only Admin Can Perform This Action"
-                      : ""
-                  }
-                  onClick={() =>
-                    handleEdit(
-                      employee
-                    )
-                  }
-                >
-                  Edit
-                </button>
+                          <div className="employee-avatar">
+                            {getInitials(employee.name)}
+                          </div>
 
-                <button
-                  className="delete-btn"
-                  disabled={!isAdmin}
-                  title={
-                    role !== "admin"
-                      ? "Only Admin Can Perform This Action"
-                      : ""
-                  }
-                  onClick={() => {
+                          <div>
 
-                    if (!isAdmin)
-                      return;
+                            <h4>
+                              {employee.name}
+                            </h4>
 
-                    setSelectedEmployee(
-                      employee
-                    );
+                            <p>
+                              {employee.email}
+                            </p>
 
-                    setDeleteModal(
-                      true
-                    );
-                  }}
-                >
-                  Delete
-                </button>
+                          </div>
 
-              </div>
+                        </div>
 
-            </div>
-          )
-        )}
+                      </td>
+
+                      <td>
+                        {employee.role || "Employee"}
+                      </td>
+
+                      <td>
+                        {employee.department}
+                      </td>
+
+                      <td
+                        onClick={(event) =>
+                          event.stopPropagation()
+                        }
+                      >
+
+                        <select
+                          className={`status-select ${
+                            (employee.status || "Active") === "Active"
+                              ? "active"
+                              : (employee.status || "Active") === "Inactive"
+                              ? "inactive"
+                              : "leave"
+                          }`}
+                          value={employee.status || "Active"}
+                          disabled={!isAdmin}
+                          onChange={(event) =>
+                            handleStatusChange(
+                              employee,
+                              event.target.value
+                            )
+                          }
+                        >
+
+                          <option value="Active">
+                            Active
+                          </option>
+
+                          <option value="Inactive">
+                            Inactive
+                          </option>
+
+                          <option value="On Leave">
+                            On Leave
+                          </option>
+
+                        </select>
+
+                      </td>
+
+                      <td>
+                        {employee.joinedDate || "-"}
+                      </td>
+
+                      <td>
+                        {employee.reportingManagerName || "None"}
+                      </td>
+
+                      <td
+                        onClick={(event) =>
+                          event.stopPropagation()
+                        }
+                      >
+
+                        <div className="employee-actions">
+
+                          <button
+                            className="edit-btn"
+                            disabled={!isAdmin}
+                            title={
+                              role !== "admin"
+                                ? "Only Admin Can Perform This Action"
+                                : ""
+                            }
+                            onClick={() =>
+                              handleEdit(
+                                employee
+                              )
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="delete-btn"
+                            disabled={!isAdmin}
+                            title={
+                              role !== "admin"
+                                ? "Only Admin Can Perform This Action"
+                                : ""
+                            }
+                            onClick={() => {
+
+                              if (!isAdmin)
+                                return;
+
+                              setSelectedEmployee(
+                                employee
+                              );
+
+                              setDeleteModal(
+                                true
+                              );
+
+                            }}
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  )
+                )
+
+              )
+            }
+
+          </tbody>
+
+        </table>
 
       </div>
 
-      {/* DELETE MODAL */}
       {deleteModal && (
 
         <div className="modal-overlay">
@@ -887,17 +1147,14 @@ setTimeout(() => {
             </h2>
 
             <p>
-              Are you sure you want
-              to delete this employee?
+              Are you sure you want to delete this employee?
             </p>
 
             <div className="modal-buttons">
 
               <button
                 className="delete-btn"
-                onClick={
-                  handleDelete
-                }
+                onClick={handleDelete}
               >
                 Yes Delete
               </button>
@@ -905,9 +1162,7 @@ setTimeout(() => {
               <button
                 className="cancel-btn"
                 onClick={() =>
-                  setDeleteModal(
-                    false
-                  )
+                  setDeleteModal(false)
                 }
               >
                 Cancel
@@ -918,9 +1173,9 @@ setTimeout(() => {
           </div>
 
         </div>
+
       )}
 
-      {/* PAGINATION */}
       <div className="pagination">
 
         <button
@@ -955,6 +1210,7 @@ setTimeout(() => {
             >
               {index + 1}
             </button>
+
           )
         )}
 
@@ -975,7 +1231,9 @@ setTimeout(() => {
       </div>
 
     </div>
+
   );
+
 }
 
 export default EmployeesPage;

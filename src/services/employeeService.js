@@ -13,6 +13,17 @@ localStorage.getItem("company")
 
 };
 
+const getUserName = () => {
+
+return (
+localStorage.getItem("email")
+||
+"Admin User"
+);
+
+};
+
+
 // FETCH EMPLOYEES
 export const fetchEmployees =
 async()=>{
@@ -40,6 +51,63 @@ return [];
 
 };
 
+
+// FETCH SINGLE EMPLOYEE DETAILS
+export const fetchEmployeeById =
+async(id)=>{
+
+try{
+
+const response =
+await axios.get(
+
+`${BASE_URL}/${id}?company=${getCompany()}`
+
+);
+
+return response.data;
+
+}
+
+catch(error){
+
+console.log(error);
+
+return null;
+
+}
+
+};
+
+
+// FETCH REPORTING MANAGERS
+export const fetchReportingManagersApi =
+async()=>{
+
+try{
+
+const response =
+await axios.get(
+
+`${BASE_URL}/managers/list?company=${getCompany()}`
+
+);
+
+return response.data;
+
+}
+
+catch(error){
+
+console.log(error);
+
+return [];
+
+}
+
+};
+
+
 // ADD EMPLOYEE
 export const addEmployeeApi =
 async(employeeData)=>{
@@ -51,12 +119,15 @@ BASE_URL,
 {
 ...employeeData,
 
-company:getCompany()
+company:getCompany(),
+
+userName:getUserName()
 }
 
 );
 
 };
+
 
 // UPDATE EMPLOYEE
 export const updateEmployeeApi =
@@ -69,12 +140,15 @@ return await axios.put(
 {
 ...data,
 
-company:getCompany()
+company:getCompany(),
+
+userName:getUserName()
 }
 
 );
 
 };
+
 
 // DELETE EMPLOYEE
 export const deleteEmployeeApi =
@@ -82,7 +156,7 @@ async(id)=>{
 
 return await axios.delete(
 
-`${BASE_URL}/${id}?company=${getCompany()}`
+`${BASE_URL}/${id}?company=${getCompany()}&userName=${getUserName()}`
 
 );
 
