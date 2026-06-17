@@ -38,6 +38,19 @@ function EmployeesPage() {
     localStorage.getItem("company") ||
     "Stackly";
 
+  const currentPlan =
+    localStorage.getItem("plan") ||
+    "Free";
+
+  const planLimits = {
+    Free: 5,
+    Professional: 25,
+    Enterprise: 100,
+  };
+
+  const employeeLimit =
+    planLimits[currentPlan] || 5;
+
   const isAdmin =
     role === "admin";
 
@@ -113,6 +126,12 @@ function EmployeesPage() {
       joinedDate: "",
       reportingManagerId: "",
     });
+
+  const isEmployeeLimitReached =
+    employees.length >= employeeLimit;
+
+  const canAddEmployee =
+    isAdmin && !isEmployeeLimitReached;
 
   useEffect(() => {
     loadEmployees();
@@ -206,6 +225,20 @@ function EmployeesPage() {
 
     if (!isAdmin) return;
 
+    if (isEmployeeLimitReached) {
+
+      setPopupMessage(
+        "Upgrade your plan to add employees"
+      );
+
+      setTimeout(() => {
+        setPopupMessage("");
+      }, 3000);
+
+      return;
+
+    }
+
     resetForm();
 
     loadReportingManagers();
@@ -219,6 +252,20 @@ function EmployeesPage() {
     event.preventDefault();
 
     if (!isEmployeeFormValid) return;
+
+    if (!editEmployeeId && isEmployeeLimitReached) {
+
+      setPopupMessage(
+        "Upgrade your plan to add employees"
+      );
+
+      setTimeout(() => {
+        setPopupMessage("");
+      }, 3000);
+
+      return;
+
+    }
 
     const employeeData = {
       ...formData,
@@ -559,17 +606,19 @@ function EmployeesPage() {
           </p>
 
           <p>
-            Company: {company}
+            Company: {company} | Plan: {currentPlan} | Employees: {employees.length} / {employeeLimit}
           </p>
 
         </div>
 
         <button
           className="add-btn"
-          disabled={!isAdmin}
+          disabled={!canAddEmployee}
           title={
-            role !== "admin"
+            !isAdmin
               ? "Only Admin Can Perform This Action"
+              : isEmployeeLimitReached
+              ? "Upgrade your plan to add employees"
               : ""
           }
           onClick={openAddModal}
@@ -578,6 +627,17 @@ function EmployeesPage() {
         </button>
 
       </div>
+
+      {
+        isAdmin &&
+        isEmployeeLimitReached && (
+
+          <div className="error-message">
+            Upgrade your plan to add employees. Your {currentPlan} plan allows only {employeeLimit} employees.
+          </div>
+
+        )
+      }
 
       {!isAdmin && (
 

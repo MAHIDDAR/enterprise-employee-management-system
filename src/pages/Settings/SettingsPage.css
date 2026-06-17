@@ -318,3 +318,163 @@ body.dark-theme .request-card p {
 body.dark-theme .request-card strong {
   color: white;
 }
+.subscription-card {
+  grid-column: 1 / -1;
+}
+
+.current-plan-box {
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  background: #f8fafc;
+}
+
+.current-plan-box p {
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.current-plan-box h3 {
+  font-size: 26px;
+  color: #0f172a;
+}
+
+.current-plan-box span {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  color: #0f172a;
+  background: white;
+}
+
+.usage-section {
+  margin-top: 28px;
+}
+
+.usage-row {
+  margin-top: 18px;
+}
+
+.usage-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.usage-label strong {
+  color: #ef4444;
+}
+
+.usage-bar {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.usage-progress {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999px;
+}
+
+.usage-progress.danger {
+  background: #ef4444;
+}
+
+.plans-section {
+  margin-top: 30px;
+}
+
+.plans-section > p {
+  margin-top: 10px;
+  color: #64748b;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.plan-card {
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 22px;
+  background: #f8fafc;
+}
+
+.plan-card.active-plan {
+  border: 2px solid #2563eb;
+}
+
+.plan-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-title-row h3 {
+  color: #0f172a;
+}
+
+.plan-title-row span {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.plan-card p {
+  margin-top: 12px;
+  color: #64748b;
+}
+
+.select-plan-btn {
+  width: 100%;
+  margin-top: 18px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.select-plan-btn:hover {
+  background: #1d4ed8;
+}
+
+body.dark-theme .current-plan-box,
+body.dark-theme .plan-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-theme .current-plan-box h3,
+body.dark-theme .plan-title-row h3 {
+  color: white;
+}
+
+body.dark-theme .current-plan-box span {
+  background: #334155;
+  color: white;
+  border-color: #475569;
+}
+
+body.dark-theme .plan-card p,
+body.dark-theme .plans-section > p {
+  color: #cbd5e1;
+}
+
+@media(max-width: 900px) {
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}

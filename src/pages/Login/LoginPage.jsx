@@ -106,6 +106,10 @@ localStorage.setItem(
 "company",
 response.company
 );
+localStorage.setItem(
+"plan",
+response.plan || "Free"
+);
 
 localStorage.setItem(
 "token",

@@ -4,6 +4,10 @@ import {
 } from "react";
 
 import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
   fetchEmployees,
 } from "../../services/employeeService";
 
@@ -25,6 +29,30 @@ import "./DashboardPage.css";
 
 function DashboardPage() {
 
+  const navigate =
+    useNavigate();
+
+  const role =
+    localStorage.getItem("role");
+
+  const plan =
+    localStorage.getItem("plan") || "Free";
+
+  const userName =
+    localStorage.getItem("email") || "User";
+
+  const company =
+    localStorage.getItem("company") || "Company";
+
+  /*
+    Plan restriction is only for admins.
+    Normal users dashboard remains same.
+  */
+  const hasAnalyticsAccess =
+    role !== "admin" ||
+    plan === "Professional" ||
+    plan === "Enterprise";
+
   const [employees, setEmployees] =
     useState([]);
 
@@ -34,6 +62,10 @@ function DashboardPage() {
       activeEmployees: 0,
       totalDepartments: 0,
       pendingRequests: 0,
+      pendingRoleRequests: 0,
+      pendingReactivationRequests: 0,
+      pendingAttendanceAccessRequests: 0,
+      pendingLeaveRequests: 0,
     });
 
   const [
@@ -81,27 +113,31 @@ function DashboardPage() {
       const employeeData =
         await fetchEmployees();
 
-      const dashboardAnalytics =
-        await getDashboardAnalyticsApi();
-
-      const departmentAnalytics =
-        await getEmployeesByDepartmentApi();
-
-      const statusAnalytics =
-        await getEmployeeStatusApi();
-
-      const roleAnalytics =
-        await getRoleCountApi();
-
       setEmployees(employeeData);
 
-      setAnalyticsData(dashboardAnalytics);
+      if (hasAnalyticsAccess) {
 
-      setDepartmentData(departmentAnalytics);
+        const dashboardAnalytics =
+          await getDashboardAnalyticsApi();
 
-      setStatusData(statusAnalytics);
+        const departmentAnalytics =
+          await getEmployeesByDepartmentApi();
 
-      setRoleData(roleAnalytics);
+        const statusAnalytics =
+          await getEmployeeStatusApi();
+
+        const roleAnalytics =
+          await getRoleCountApi();
+
+        setAnalyticsData(dashboardAnalytics);
+
+        setDepartmentData(departmentAnalytics);
+
+        setStatusData(statusAnalytics);
+
+        setRoleData(roleAnalytics);
+
+      }
 
       setError("");
 
@@ -145,13 +181,27 @@ function DashboardPage() {
 
         <div>
 
-          <h1>Dashboard</h1>
+          <h1>
+            Dashboard
+          </h1>
 
           <p>
             Welcome back,{" "}
-            {localStorage.getItem("role") === "admin"
-              ? "Admin 👋"
-              : "User 👋"}
+            {
+              role === "admin"
+              ?
+              "Admin 👋"
+              :
+              "User 👋"
+            }
+          </p>
+
+          <p>
+            Company: {company}
+            {
+              role === "admin" &&
+              <> | Plan: {plan}</>
+            }
           </p>
 
         </div>
@@ -175,30 +225,61 @@ function DashboardPage() {
 
       </div>
 
-      <DashboardCards
-        employees={employees}
-        analyticsData={analyticsData}
-      />
+      {
+        role === "admin" && !hasAnalyticsAccess
+        ?
 
-      <div className="dashboard-grid">
+        <div className="analytics-plan-card">
 
-        <EmployeeChart employees={employees} />
+          <h2>
+            Analytics not available on your plan
+          </h2>
 
-        <EmployeeTable employees={employees} />
+          <p>
+            Upgrade to Professional or Enterprise in Settings to unlock dashboard analytics, charts, and KPIs.
+          </p>
 
-        <AttendanceChart
-          statusData={statusData}
-        />
+          <button
+            className="settings-upgrade-btn"
+            onClick={() => navigate("/settings")}
+          >
+            Go to Settings
+          </button>
 
-        <DepartmentDistributionChart
-          departmentData={departmentData}
-        />
+        </div>
 
-        <RoleCountChart
-          roleData={roleData}
-        />
+        :
 
-      </div>
+        <>
+
+          <DashboardCards
+            employees={employees}
+            analyticsData={analyticsData}
+          />
+
+          <div className="dashboard-grid">
+
+            <EmployeeChart employees={employees} />
+
+            <EmployeeTable employees={employees} />
+
+            <AttendanceChart
+              statusData={statusData}
+            />
+
+            <DepartmentDistributionChart
+              departmentData={departmentData}
+            />
+
+            <RoleCountChart
+              roleData={roleData}
+            />
+
+          </div>
+
+        </>
+
+      }
 
     </div>
   );

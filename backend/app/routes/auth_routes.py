@@ -14,6 +14,7 @@ users = [
         "password": "admin123",
         "role": "admin",
         "company": "Stackly",
+        "plan": "Free",
         "status": "Active",
         "reactivationStatus": "Not Requested",
         "deactivatedBy": ""
@@ -25,6 +26,7 @@ users = [
         "password": "user123",
         "role": "user",
         "company": "Stackly",
+        "plan": "Free",
         "status": "Active",
         "reactivationStatus": "Not Requested",
         "deactivatedBy": ""
@@ -36,6 +38,7 @@ users = [
         "password": "admin123",
         "role": "admin",
         "company": "TCS",
+        "plan": "Free",
         "status": "Active",
         "reactivationStatus": "Not Requested",
         "deactivatedBy": ""
@@ -47,6 +50,7 @@ users = [
         "password": "user123",
         "role": "user",
         "company": "TCS",
+        "plan": "Free",
         "status": "Active",
         "reactivationStatus": "Not Requested",
         "deactivatedBy": ""
@@ -102,6 +106,7 @@ def signup(user: dict):
         "password": password,
         "role": role,
         "company": company,
+        "plan": "Free",
         "status": "Active",
         "reactivationStatus": "Not Requested",
         "deactivatedBy": ""
@@ -117,7 +122,7 @@ def signup(user: dict):
 
 # LOGIN
 # LOGIN CHECKS EMAIL AND PASSWORD ONLY
-# ROLE AND COMPANY COME FROM BACKEND USER DATA
+# ROLE, COMPANY AND PLAN COME FROM BACKEND USER DATA
 
 @auth_router.post("/auth/login")
 def login(user: dict):
@@ -150,6 +155,11 @@ def login(user: dict):
                 "user"
             )
 
+            plan = existing_user.get(
+                "plan",
+                "Free"
+            )
+
             account_status = existing_user.get(
                 "status",
                 "Active"
@@ -172,6 +182,7 @@ def login(user: dict):
                     "email": existing_user.get("email"),
                     "role": role,
                     "company": company,
+                    "plan": plan,
                     "status": account_status
 
                 }
@@ -185,6 +196,7 @@ def login(user: dict):
                 "name": existing_user.get("name"),
                 "role": role,
                 "company": company,
+                "plan": plan,
                 "accountStatus": account_status,
                 "reactivationStatus": reactivation_status,
                 "deactivatedBy": deactivated_by,
@@ -200,7 +212,7 @@ def login(user: dict):
 
 
 # GET CURRENT USER
-# USED BY NAVBAR TO CHECK LATEST ROLE AND COMPANY
+# USED BY NAVBAR TO CHECK LATEST ROLE, COMPANY AND PLAN
 
 @auth_router.get("/auth/current-user")
 def get_current_user(
@@ -225,12 +237,56 @@ def get_current_user(
                 "company": normalize_company(
                     user.get("company")
                 ),
+                "plan": user.get("plan", "Free"),
                 "accountStatus": user.get("status", "Active"),
                 "reactivationStatus": user.get(
                     "reactivationStatus",
                     "Not Requested"
                 ),
                 "deactivatedBy": user.get("deactivatedBy", "")
+            }
+
+    return {
+        "message": "User Not Found"
+    }
+
+
+# UPDATE SUBSCRIPTION PLAN
+
+@auth_router.put("/auth/update-plan")
+def update_plan(data: dict):
+
+    email = data.get("email")
+    company = normalize_company(
+        data.get("company", "Stackly")
+    )
+    plan = data.get("plan", "Free")
+
+    valid_plans = [
+        "Free",
+        "Professional",
+        "Enterprise"
+    ]
+
+    if plan not in valid_plans:
+
+        return {
+            "message": "Invalid Plan"
+        }
+
+    for user in users:
+
+        if (
+            user["email"].lower() == email.lower()
+            and
+            normalize_company(user.get("company")) == company
+        ):
+
+            user["plan"] = plan
+
+            return {
+                "message": "Plan Updated Successfully",
+                "plan": plan
             }
 
     return {
@@ -263,6 +319,11 @@ def get_users(company: str):
 
                 "company": normalize_company(
                     user.get("company")
+                ),
+
+                "plan": user.get(
+                    "plan",
+                    "Free"
                 ),
 
                 "status": user.get(

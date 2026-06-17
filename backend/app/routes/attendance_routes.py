@@ -28,18 +28,24 @@ def get_access_status(
 
     company = normalize_company(company)
 
+    latest_request = None
+
     for request in attendance_access_requests:
 
         if (
             request.get("email") == email
             and
-            request.get("company") == company
+            normalize_company(request.get("company")) == company
         ):
 
-            return {
-                "status": request.get("status"),
-                "submittedAt": request.get("submittedAt")
-            }
+            latest_request = request
+
+    if latest_request:
+
+        return {
+            "status": latest_request.get("status"),
+            "submittedAt": latest_request.get("submittedAt")
+        }
 
     return {
         "status": "not_requested",
@@ -60,20 +66,21 @@ def create_access_request(data: dict):
         data.get("company", "Stackly")
     )
 
+    # IMPORTANT:
+    # Do not create new pending request if already approved/rejected/pending.
     for request in attendance_access_requests:
 
         if (
             request.get("email") == email
             and
-            request.get("company") == company
-            and
-            request.get("status") == "pending"
+            normalize_company(request.get("company")) == company
         ):
 
             return {
-                "message": "Request Already Pending",
-                "status": "pending",
-                "submittedAt": request.get("submittedAt")
+                "message": f"Request Already {request.get('status')}",
+                "status": request.get("status"),
+                "submittedAt": request.get("submittedAt"),
+                "data": request
             }
 
     submitted_at = datetime.now().strftime(
@@ -86,7 +93,11 @@ def create_access_request(data: dict):
         "email": email,
         "company": company,
         "status": "pending",
-        "submittedAt": submitted_at
+        "submittedAt": submitted_at,
+        "approvedBy": "",
+        "approvedAt": "",
+        "rejectedBy": "",
+        "rejectedAt": ""
     }
 
     attendance_access_requests.append(new_request)
@@ -108,6 +119,7 @@ def create_access_request(data: dict):
 
 
 # ADMIN GET ATTENDANCE ACCESS REQUESTS
+# ONLY PENDING REQUESTS SHOULD SHOW TO ADMINS
 
 @attendance_router.get("/access-requests")
 def get_access_requests(company: str = "Stackly"):
@@ -118,7 +130,11 @@ def get_access_requests(company: str = "Stackly"):
 
     for request in attendance_access_requests:
 
-        if request.get("company") == company:
+        if (
+            normalize_company(request.get("company")) == company
+            and
+            request.get("status") == "pending"
+        ):
 
             result.append(request)
 
@@ -147,10 +163,20 @@ def approve_access_request(
         if (
             request.get("id") == request_id
             and
-            request.get("company") == company
+            normalize_company(request.get("company")) == company
         ):
 
+            if request.get("status") != "pending":
+
+                return {
+                    "message": f"Request Already {request.get('status')}"
+                }
+
             request["status"] = "approved"
+            request["approvedBy"] = approved_by
+            request["approvedAt"] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
             create_audit_log(
                 user_name=approved_by,
@@ -191,10 +217,20 @@ def reject_access_request(
         if (
             request.get("id") == request_id
             and
-            request.get("company") == company
+            normalize_company(request.get("company")) == company
         ):
 
+            if request.get("status") != "pending":
+
+                return {
+                    "message": f"Request Already {request.get('status')}"
+                }
+
             request["status"] = "rejected"
+            request["rejectedBy"] = rejected_by
+            request["rejectedAt"] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
             create_audit_log(
                 user_name=rejected_by,
@@ -235,7 +271,7 @@ def check_in(data: dict):
         if (
             record.get("email") == email
             and
-            record.get("company") == company
+            normalize_company(record.get("company")) == company
             and
             record.get("date") == today
         ):
@@ -309,7 +345,7 @@ def check_out(data: dict):
         if (
             record.get("email") == email
             and
-            record.get("company") == company
+            normalize_company(record.get("company")) == company
             and
             record.get("date") == today
         ):
@@ -396,7 +432,7 @@ def get_my_attendance(
         if (
             record.get("email") == email
             and
-            record.get("company") == company
+            normalize_company(record.get("company")) == company
         ):
 
             history.append(record)
@@ -453,7 +489,11 @@ def submit_leave_request(data: dict):
         "endDate": end_date,
         "reason": reason,
         "status": "pending",
-        "submittedAt": submitted_at
+        "submittedAt": submitted_at,
+        "approvedBy": "",
+        "approvedAt": "",
+        "rejectedBy": "",
+        "rejectedAt": ""
     }
 
     leave_requests.append(new_leave)
@@ -489,7 +529,7 @@ def get_my_leaves(
         if (
             request.get("email") == email
             and
-            request.get("company") == company
+            normalize_company(request.get("company")) == company
         ):
 
             result.append(request)
@@ -498,6 +538,7 @@ def get_my_leaves(
 
 
 # ADMIN GET ALL LEAVE REQUESTS
+# ONLY PENDING LEAVE REQUESTS SHOULD SHOW TO ADMINS
 
 @attendance_router.get("/leave-requests")
 def get_leave_requests(company: str = "Stackly"):
@@ -508,7 +549,11 @@ def get_leave_requests(company: str = "Stackly"):
 
     for request in leave_requests:
 
-        if request.get("company") == company:
+        if (
+            normalize_company(request.get("company")) == company
+            and
+            request.get("status") == "pending"
+        ):
 
             result.append(request)
 
@@ -537,10 +582,20 @@ def approve_leave_request(
         if (
             request.get("id") == request_id
             and
-            request.get("company") == company
+            normalize_company(request.get("company")) == company
         ):
 
+            if request.get("status") != "pending":
+
+                return {
+                    "message": f"Leave Request Already {request.get('status')}"
+                }
+
             request["status"] = "approved"
+            request["approvedBy"] = approved_by
+            request["approvedAt"] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
             create_audit_log(
                 user_name=approved_by,
@@ -581,10 +636,20 @@ def reject_leave_request(
         if (
             request.get("id") == request_id
             and
-            request.get("company") == company
+            normalize_company(request.get("company")) == company
         ):
 
+            if request.get("status") != "pending":
+
+                return {
+                    "message": f"Leave Request Already {request.get('status')}"
+                }
+
             request["status"] = "rejected"
+            request["rejectedBy"] = rejected_by
+            request["rejectedAt"] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
             create_audit_log(
                 user_name=rejected_by,

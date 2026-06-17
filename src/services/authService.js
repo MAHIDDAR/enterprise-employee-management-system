@@ -163,3 +163,24 @@ await axios.get(
 return response.data;
 
 };
+export const updatePlanApi = async(plan)=>{
+
+const email =
+localStorage.getItem("email");
+
+const company =
+localStorage.getItem("company") || "Stackly";
+
+const response =
+await axios.put(
+`${BASE_URL}/update-plan`,
+{
+email:email,
+company:company,
+plan:plan
+}
+);
+
+return response.data;
+
+};

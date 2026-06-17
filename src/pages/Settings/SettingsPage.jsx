@@ -4,6 +4,8 @@ useEffect,
 useContext
 } from "react";
 
+import axios from "axios";
+
 import {
 
 sendRoleRequestApi,
@@ -28,6 +30,10 @@ rejectLeaveRequestApi
 } from "../../services/attendanceService";
 
 import {
+fetchEmployees
+} from "../../services/employeeService";
+
+import {
 ThemeContext
 } from "../../context/ThemeContext";
 
@@ -48,6 +54,17 @@ localStorage.getItem("email");
 
 const company=
 localStorage.getItem("company") || "Stackly";
+
+const [currentPlan,setCurrentPlan] =
+useState(
+localStorage.getItem("plan") || "Free"
+);
+
+const [employeeCount,setEmployeeCount] =
+useState(0);
+
+const [adminCount,setAdminCount] =
+useState(0);
 
 const [formData,setFormData]=
 useState({
@@ -74,7 +91,40 @@ leaveRequests,
 setLeaveRequests
 ] = useState([]);
 
+const plans = {
+
+Free:{
+name:"Free",
+maxEmployees:5,
+maxAdmins:1,
+analytics:"No",
+auditLogs:"No",
+exportAccess:"No"
+},
+
+Professional:{
+name:"Professional",
+maxEmployees:25,
+maxAdmins:3,
+analytics:"Yes",
+auditLogs:"Yes",
+exportAccess:"Yes"
+},
+
+Enterprise:{
+name:"Enterprise",
+maxEmployees:100,
+maxAdmins:10,
+analytics:"Yes",
+auditLogs:"Yes",
+exportAccess:"Yes"
+}
+
+};
+
 useEffect(()=>{
+
+loadUsageData();
 
 if(role==="admin"){
 
@@ -87,6 +137,65 @@ loadLeaveRequests();
 }
 
 },[role]);
+
+const loadUsageData =
+async()=>{
+
+try{
+
+const employeesData =
+await fetchEmployees();
+
+setEmployeeCount(
+employeesData.length
+);
+
+const usersResponse =
+await axios.get(
+`http://127.0.0.1:8000/auth/users?company=${company}`
+);
+
+const admins =
+usersResponse.data.filter(
+(user)=> user.role === "admin"
+);
+
+setAdminCount(
+admins.length
+);
+
+}
+catch(error){
+
+console.log(error);
+
+}
+
+};
+
+const selectPlan =
+(planName)=>{
+
+localStorage.setItem(
+"plan",
+planName
+);
+
+setCurrentPlan(
+planName
+);
+
+setMessage(
+`${planName} plan selected successfully`
+);
+
+setTimeout(()=>{
+
+setMessage("");
+
+},3000);
+
+};
 
 const loadRequests=
 async()=>{
@@ -258,6 +367,8 @@ await approveRequestApi(id);
 
 loadRequests();
 
+loadUsageData();
+
 }
 
 catch(error){
@@ -367,6 +478,24 @@ console.log(error);
 
 };
 
+const employeeLimit =
+plans[currentPlan].maxEmployees;
+
+const adminLimit =
+plans[currentPlan].maxAdmins;
+
+const employeeUsagePercent =
+Math.min(
+(employeeCount / employeeLimit) * 100,
+100
+);
+
+const adminUsagePercent =
+Math.min(
+(adminCount / adminLimit) * 100,
+100
+);
+
 return(
 
 <div className="settings-page">
@@ -381,13 +510,224 @@ Settings
 
 <p>
 
-Manage appearance, notifications and preferences
+Manage appearance, notifications, subscription and preferences
 
 </p>
 
 </div>
 
+{
+message &&
+
+<div className="success-message">
+
+{message}
+
+</div>
+}
+
 <div className="settings-grid">
+
+{/* SUBSCRIPTION PLAN */}
+
+{
+role==="admin" &&
+
+<div className="settings-card subscription-card">
+
+<h2>
+
+💳 Subscription & Plan
+
+</h2>
+
+<div className="current-plan-box">
+
+<div>
+
+<p>
+
+Current Plan
+
+</p>
+
+<h3>
+
+{currentPlan}
+
+</h3>
+
+</div>
+
+<span>
+
+{currentPlan.toUpperCase()}
+
+</span>
+
+</div>
+
+<div className="usage-section">
+
+<h3>
+
+Usage
+
+</h3>
+
+<div className="usage-row">
+
+<div className="usage-label">
+
+<span>Employees</span>
+
+<strong>
+{employeeCount} / {employeeLimit}
+</strong>
+
+</div>
+
+<div className="usage-bar">
+
+<div
+className={
+employeeCount >= employeeLimit
+?
+"usage-progress danger"
+:
+"usage-progress"
+}
+style={{
+width:`${employeeUsagePercent}%`
+}}
+>
+</div>
+
+</div>
+
+</div>
+
+<div className="usage-row">
+
+<div className="usage-label">
+
+<span>Admins</span>
+
+<strong>
+{adminCount} / {adminLimit}
+</strong>
+
+</div>
+
+<div className="usage-bar">
+
+<div
+className={
+adminCount >= adminLimit
+?
+"usage-progress danger"
+:
+"usage-progress"
+}
+style={{
+width:`${adminUsagePercent}%`
+}}
+>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div className="plans-section">
+
+<h3>
+
+Change Plan
+
+</h3>
+
+<p>
+
+Select a plan for your admin account. Other admins in your company keep their own plans.
+
+</p>
+
+<div className="plan-grid">
+
+{
+Object.values(plans).map(
+(plan)=>(
+
+<div
+key={plan.name}
+className={
+currentPlan === plan.name
+?
+"plan-card active-plan"
+:
+"plan-card"
+}
+>
+
+<div className="plan-title-row">
+
+<h3>
+
+{plan.name}
+
+</h3>
+
+{
+currentPlan === plan.name &&
+
+<span>
+
+CURRENT
+
+</span>
+}
+
+</div>
+
+<p>✓ Max Employees: <strong>{plan.maxEmployees}</strong></p>
+
+<p>✓ Max Admins: <strong>{plan.maxAdmins}</strong></p>
+
+<p>✓ Analytics Access: <strong>{plan.analytics}</strong></p>
+
+<p>✓ Audit Log Access: <strong>{plan.auditLogs}</strong></p>
+
+<p>✓ Export Access: <strong>{plan.exportAccess}</strong></p>
+
+{
+currentPlan !== plan.name &&
+
+<button
+className="select-plan-btn"
+onClick={()=>selectPlan(plan.name)}
+>
+
+Select {plan.name}
+
+</button>
+}
+
+</div>
+
+)
+)
+}
+
+</div>
+
+</div>
+
+</div>
+
+}
 
 {/* APPEARANCE */}
 
@@ -527,6 +867,20 @@ Company:
 
 </p>
 
+<p>
+
+<strong>
+
+Plan:
+
+</strong>
+
+{" "}
+
+{currentPlan}
+
+</p>
+
 </div>
 
 {/* USER */}
@@ -582,18 +936,6 @@ onClick={submitRequest}
 Send Request
 
 </button>
-
-{
-
-message &&
-
-<p>
-
-{message}
-
-</p>
-
-}
 
 </div>
 

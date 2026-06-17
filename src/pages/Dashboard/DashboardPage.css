@@ -277,3 +277,51 @@ body.dark-theme select,
   color: white !important;
   border: 1px solid #475569 !important;
 }
+.analytics-plan-card {
+  margin-top: 28px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.analytics-plan-card h2 {
+  margin-bottom: 12px;
+  color: #0f172a;
+  font-size: 22px;
+}
+
+.analytics-plan-card p {
+  color: #64748b;
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.settings-upgrade-btn {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.settings-upgrade-btn:hover {
+  background: #1d4ed8;
+}
+
+body.dark-theme .analytics-plan-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-theme .analytics-plan-card h2 {
+  color: white;
+}
+
+body.dark-theme .analytics-plan-card p {
+  color: #cbd5e1;
+}
