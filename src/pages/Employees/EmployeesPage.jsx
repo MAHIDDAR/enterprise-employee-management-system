@@ -45,7 +45,7 @@ function EmployeesPage() {
   const planLimits = {
     Free: 5,
     Professional: 25,
-    Enterprise: 100,
+    Enterprise: 200,
   };
 
   const employeeLimit =
@@ -188,19 +188,41 @@ function EmployeesPage() {
 
   const handleChange = (event) => {
 
+    const {
+      name,
+      value
+    } = event.target;
+
+    if (name === "phone") {
+
+      const onlyNumbers =
+        value.replace(/\D/g, "").slice(0, 10);
+
+      setFormData({
+        ...formData,
+        phone: onlyNumbers,
+      });
+
+      return;
+    }
+
     setFormData({
       ...formData,
-      [event.target.name]:
-        event.target.value,
+      [name]: value,
     });
 
   };
+
+  const isPhoneValid =
+    formData.phone.trim() === "" ||
+    formData.phone.trim().length === 10;
 
   const isEmployeeFormValid =
     formData.name.trim() !== "" &&
     formData.email.trim() !== "" &&
     formData.role.trim() !== "" &&
-    formData.department.trim() !== "";
+    formData.department.trim() !== "" &&
+    isPhoneValid;
 
   const resetForm = () => {
 
@@ -251,7 +273,22 @@ function EmployeesPage() {
 
     event.preventDefault();
 
-    if (!isEmployeeFormValid) return;
+    if (!isEmployeeFormValid) {
+
+      if (!isPhoneValid) {
+
+        setPopupMessage(
+          "Phone number must be 10 digits"
+        );
+
+        setTimeout(() => {
+          setPopupMessage("");
+        }, 3000);
+
+      }
+
+      return;
+    }
 
     if (!editEmployeeId && isEmployeeLimitReached) {
 
@@ -352,13 +389,18 @@ function EmployeesPage() {
 
     if (!isAdmin) return;
 
+    const phoneNumber =
+      (employee.phone || "")
+        .replace(/\D/g, "")
+        .slice(0, 10);
+
     setFormData({
       name: employee.name || "",
       email: employee.email || "",
       role: employee.role || "",
       department: employee.department || "",
       city: employee.city || "",
-      phone: employee.phone || "",
+      phone: phoneNumber,
       company: employee.company || company,
       status: employee.status || "Active",
       joinedDate: employee.joinedDate || "",
@@ -373,6 +415,33 @@ function EmployeesPage() {
     loadReportingManagers();
 
     setShowModal(true);
+
+  };
+
+  const getStatusNotificationMessage = (
+    employeeName,
+    status
+  ) => {
+
+    if (status === "Active") {
+
+      return `${employeeName} is now Active`;
+
+    }
+
+    if (status === "Inactive") {
+
+      return `${employeeName} is now Inactive`;
+
+    }
+
+    if (status === "On Leave") {
+
+      return `${employeeName} is on Leave`;
+
+    }
+
+    return `${employeeName} status changed to ${status}`;
 
   };
 
@@ -396,12 +465,18 @@ function EmployeesPage() {
         updatedEmployee
       );
 
+      const notificationMessage =
+        getStatusNotificationMessage(
+          employee.name,
+          newStatus
+        );
+
       addNotification(
-        `${employee.name} status changed to ${newStatus}`
+        notificationMessage
       );
 
       setSuccessMessage(
-        `${employee.name} status changed to ${newStatus}`
+        notificationMessage
       );
 
       await loadEmployees();
@@ -841,28 +916,25 @@ function EmployeesPage() {
                   </label>
 
                   <input
-                    type="text"
+                    type="tel"
                     name="phone"
-                    placeholder="Phone"
+                    placeholder="10 digit phone number"
                     value={formData.phone}
                     onChange={handleChange}
+                    maxLength="10"
+                    inputMode="numeric"
                   />
 
-                </div>
+                  {
+                    formData.phone &&
+                    formData.phone.length < 10 && (
 
-                <div className="form-group">
+                      <small className="input-error-text">
+                        Phone number must be 10 digits
+                      </small>
 
-                  <label>
-                    City
-                  </label>
-
-                  <input
-                    type="text"
-                    name="city"
-                    placeholder="City"
-                    value={formData.city}
-                    onChange={handleChange}
-                  />
+                    )
+                  }
 
                 </div>
 
@@ -894,6 +966,22 @@ function EmployeesPage() {
                     }
 
                   </select>
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    City
+                  </label>
+
+                  <input
+                    type="text"
+                    name="city"
+                    placeholder="City"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
 
                 </div>
 

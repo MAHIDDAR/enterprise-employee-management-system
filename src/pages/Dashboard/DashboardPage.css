@@ -325,3 +325,16 @@ body.dark-theme .analytics-plan-card h2 {
 body.dark-theme .analytics-plan-card p {
   color: #cbd5e1;
 }
+.settings-inline-btn {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.settings-inline-btn:hover {
+  text-decoration: underline;
+}

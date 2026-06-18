@@ -52,6 +52,7 @@ function Navbar({ toggleSidebar }) {
   const {
     notifications,
     unreadCount,
+    markNotificationsAsRead,
     clearNotifications,
   } = useContext(
     EmployeeContext
@@ -123,7 +124,6 @@ function Navbar({ toggleSidebar }) {
       );
 
     }
-
     catch (error) {
 
       console.log(error);
@@ -152,6 +152,11 @@ function Navbar({ toggleSidebar }) {
           data.company
         );
 
+        localStorage.setItem(
+          "plan",
+          data.plan || "Free"
+        );
+
         setCurrentRole(
           data.role
         );
@@ -176,7 +181,6 @@ function Navbar({ toggleSidebar }) {
       }
 
     }
-
     catch (error) {
 
       console.log(error);
@@ -202,7 +206,9 @@ function Navbar({ toggleSidebar }) {
   }, []);
 
   const handleApproveAttendance =
-  async (id) => {
+  async (event, id) => {
+
+    event.stopPropagation();
 
     setAttendanceAccessRequests(
       attendanceAccessRequests.filter(
@@ -218,7 +224,9 @@ function Navbar({ toggleSidebar }) {
   };
 
   const handleRejectAttendance =
-  async (id) => {
+  async (event, id) => {
+
+    event.stopPropagation();
 
     setAttendanceAccessRequests(
       attendanceAccessRequests.filter(
@@ -234,7 +242,9 @@ function Navbar({ toggleSidebar }) {
   };
 
   const handleApproveLeave =
-  async (id) => {
+  async (event, id) => {
+
+    event.stopPropagation();
 
     setLeaveRequests(
       leaveRequests.filter(
@@ -250,7 +260,9 @@ function Navbar({ toggleSidebar }) {
   };
 
   const handleRejectLeave =
-  async (id) => {
+  async (event, id) => {
+
+    event.stopPropagation();
 
     setLeaveRequests(
       leaveRequests.filter(
@@ -270,17 +282,26 @@ function Navbar({ toggleSidebar }) {
     const nextState =
       !showNotifications;
 
-    setShowNotifications(
-      nextState
-    );
+    if (nextState) {
 
-    clearNotifications();
+      setShowNotifications(true);
 
-    syncCurrentUserRole();
+      markNotificationsAsRead();
 
-    if (currentRole === "admin") {
+      syncCurrentUserRole();
 
-      loadAdminNotifications();
+      if (currentRole === "admin") {
+
+        loadAdminNotifications();
+
+      }
+
+    }
+    else {
+
+      setShowNotifications(false);
+
+      clearNotifications();
 
     }
 
@@ -388,7 +409,25 @@ function Navbar({ toggleSidebar }) {
                             key={notification.id || index}
                             className="notification-item"
                           >
-                            {notification.text || notification.message || notification}
+
+                            <p>
+                              {
+                                notification.text ||
+                                notification.message ||
+                                notification
+                              }
+                            </p>
+
+                            {
+                              notification.time && (
+
+                                <small>
+                                  {notification.time}
+                                </small>
+
+                              )
+                            }
+
                           </div>
 
                         )
@@ -426,8 +465,9 @@ function Navbar({ toggleSidebar }) {
 
                               <button
                                 className="approve-btn"
-                                onClick={() =>
+                                onClick={(event) =>
                                   handleApproveAttendance(
+                                    event,
                                     request.id
                                   )
                                 }
@@ -437,8 +477,9 @@ function Navbar({ toggleSidebar }) {
 
                               <button
                                 className="reject-btn"
-                                onClick={() =>
+                                onClick={(event) =>
                                   handleRejectAttendance(
+                                    event,
                                     request.id
                                   )
                                 }
@@ -489,8 +530,9 @@ function Navbar({ toggleSidebar }) {
 
                               <button
                                 className="approve-btn"
-                                onClick={() =>
+                                onClick={(event) =>
                                   handleApproveLeave(
+                                    event,
                                     request.id
                                   )
                                 }
@@ -500,8 +542,9 @@ function Navbar({ toggleSidebar }) {
 
                               <button
                                 className="reject-btn"
-                                onClick={() =>
+                                onClick={(event) =>
                                   handleRejectLeave(
+                                    event,
                                     request.id
                                   )
                                 }
@@ -557,6 +600,10 @@ function Navbar({ toggleSidebar }) {
 
               <p>
                 Company: {currentCompany}
+              </p>
+
+              <p>
+                Plan: {localStorage.getItem("plan") || "Free"}
               </p>
 
               <button

@@ -537,3 +537,10 @@ body.dark-theme .modal-overlay {
     width: 92%;
   }
 }
+.input-error-text {
+  display: block;
+  margin-top: 6px;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -30,7 +30,6 @@ function EmployeeProvider({
     loadEmployees();
   }, []);
 
-  // LOAD EMPLOYEES
   const loadEmployees = async () => {
 
     try {
@@ -46,7 +45,6 @@ function EmployeeProvider({
     }
   };
 
-  // ADD NOTIFICATION
   const addNotification = (
     message
   ) => {
@@ -54,6 +52,7 @@ function EmployeeProvider({
     const newNotification = {
       id: Date.now(),
       text: message,
+      time: new Date().toLocaleTimeString(),
     };
 
     setNotifications((prev) => [
@@ -66,14 +65,19 @@ function EmployeeProvider({
     );
   };
 
-  // CLEAR UNREAD COUNT
-const clearNotifications = () => {
+  const markNotificationsAsRead = () => {
 
-  setNotifications([]);
+    setUnreadCount(0);
 
-  setUnreadCount(0);
+  };
 
-};
+  const clearNotifications = () => {
+
+    setNotifications([]);
+
+    setUnreadCount(0);
+
+  };
 
   return (
 
@@ -87,6 +91,7 @@ const clearNotifications = () => {
         unreadCount,
 
         addNotification,
+        markNotificationsAsRead,
         clearNotifications,
       }}
     >

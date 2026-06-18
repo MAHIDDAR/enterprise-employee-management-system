@@ -5,9 +5,7 @@ import urllib.request
 from datetime import date
 
 from app.database.database import SessionLocal
-
 from app.models.employee_model import Employee
-
 from app.utils.audit_logger import create_audit_log
 
 
@@ -15,6 +13,25 @@ router = APIRouter(
     prefix="/employees",
     tags=["Employees"]
 )
+
+
+# CLEAN PHONE NUMBER
+
+def clean_phone_number(phone):
+
+    if not phone:
+
+        return ""
+
+    only_numbers = ""
+
+    for character in str(phone):
+
+        if character.isdigit():
+
+            only_numbers += character
+
+    return only_numbers[:10]
 
 
 # FETCH EMPLOYEES FROM API
@@ -98,7 +115,7 @@ def fetch_api_employees(company: str):
             "role": roles[index % len(roles)],
             "department": departments[index % len(departments)],
             "city": user.get("address", {}).get("city", "Hyderabad"),
-            "phone": user.get("phone"),
+            "phone": clean_phone_number(user.get("phone")),
             "status": statuses[index % len(statuses)],
             "joined_date": joined_dates[index % len(joined_dates)],
             "reporting_manager_id": None,
@@ -121,7 +138,7 @@ def format_employee(employee):
         "role": employee.role or "Employee",
         "department": employee.department,
         "city": employee.city,
-        "phone": employee.phone,
+        "phone": clean_phone_number(employee.phone),
         "company": employee.company,
         "status": employee.status or "Active",
         "joinedDate": employee.joined_date,
@@ -160,8 +177,8 @@ def get_employees(company: str = "Stackly"):
                 company=company,
                 status=employee["status"],
                 joined_date=employee["joined_date"],
-                reporting_manager_id=employee["reporting_manager_id"],
-                reporting_manager_name=employee["reporting_manager_name"]
+                reporting_manager_id=None,
+                reporting_manager_name="None"
             )
 
             db.add(new_employee)
@@ -172,22 +189,6 @@ def get_employees(company: str = "Stackly"):
             Employee.company == company
         ).all()
 
-        # ASSIGN FIRST EMPLOYEE AS REPORTING MANAGER FOR OTHERS
-        if len(employees) > 1:
-
-            manager = employees[0]
-
-            for employee in employees[1:]:
-
-                employee.reporting_manager_id = manager.id
-                employee.reporting_manager_name = f"{manager.name} ({manager.role})"
-
-            db.commit()
-
-            employees = db.query(Employee).filter(
-                Employee.company == company
-            ).all()
-
     result = []
 
     for employee in employees:
@@ -195,6 +196,41 @@ def get_employees(company: str = "Stackly"):
         result.append(
             format_employee(employee)
         )
+
+    db.close()
+
+    return result
+
+
+# GET REPORTING MANAGERS FOR DROPDOWN
+# IMPORTANT: THIS SHOULD BE ABOVE /{employee_id}
+
+@router.get("/managers/list")
+def get_reporting_managers(company: str = "Stackly"):
+
+    db = SessionLocal()
+
+    employees = db.query(Employee).filter(
+        Employee.company == company
+    ).all()
+
+    result = [
+        {
+            "id": "",
+            "name": "None",
+            "role": "",
+            "label": "None"
+        }
+    ]
+
+    for employee in employees:
+
+        result.append({
+            "id": employee.id,
+            "name": employee.name,
+            "role": employee.role or "Employee",
+            "label": f"{employee.name} ({employee.role or 'Employee'})"
+        })
 
     db.close()
 
@@ -225,40 +261,6 @@ def get_employee_details(
         }
 
     result = format_employee(employee)
-
-    db.close()
-
-    return result
-
-
-# GET REPORTING MANAGERS FOR DROPDOWN
-
-@router.get("/managers/list")
-def get_reporting_managers(company: str = "Stackly"):
-
-    db = SessionLocal()
-
-    employees = db.query(Employee).filter(
-        Employee.company == company
-    ).all()
-
-    result = [
-        {
-            "id": "",
-            "name": "None",
-            "role": "",
-            "label": "None"
-        }
-    ]
-
-    for employee in employees:
-
-        result.append({
-            "id": employee.id,
-            "name": employee.name,
-            "role": employee.role or "Employee",
-            "label": f"{employee.name} ({employee.role or 'Employee'})"
-        })
 
     db.close()
 
@@ -310,13 +312,17 @@ def add_employee(employee: dict):
 
             reporting_manager_name = f"{manager.name} ({manager.role or 'Employee'})"
 
+    clean_phone = clean_phone_number(
+        employee.get("phone", "")
+    )
+
     new_employee = Employee(
         name=employee["name"],
         email=employee["email"],
         role=employee.get("role", "Employee"),
         department=employee["department"],
         city=employee.get("city", ""),
-        phone=employee.get("phone", ""),
+        phone=clean_phone,
         company=company,
         status=employee.get("status", "Active"),
         joined_date=employee.get(
@@ -397,6 +403,10 @@ def update_employee(
 
                 reporting_manager_name = f"{manager.name} ({manager.role or 'Employee'})"
 
+        clean_phone = clean_phone_number(
+            updated_employee.get("phone", "")
+        )
+
         employee.name = updated_employee["name"]
         employee.email = updated_employee["email"]
         employee.role = updated_employee.get(
@@ -408,10 +418,7 @@ def update_employee(
             "city",
             employee.city or ""
         )
-        employee.phone = updated_employee.get(
-            "phone",
-            employee.phone or ""
-        )
+        employee.phone = clean_phone
         employee.company = company
         employee.status = updated_employee.get(
             "status",

@@ -11,7 +11,8 @@ import {
 sendRoleRequestApi,
 getPendingRequestsApi,
 approveRequestApi,
-rejectRequestApi
+rejectRequestApi,
+updatePlanApi
 
 }
 
@@ -113,12 +114,24 @@ exportAccess:"Yes"
 
 Enterprise:{
 name:"Enterprise",
-maxEmployees:100,
-maxAdmins:10,
+maxEmployees:200,
+maxAdmins:20,
 analytics:"Yes",
 auditLogs:"Yes",
 exportAccess:"Yes"
 }
+
+};
+
+const planRank = {
+Free:1,
+Professional:2,
+Enterprise:3
+};
+
+const canSelectPlan = (planName)=>{
+
+return planRank[planName] > planRank[currentPlan];
 
 };
 
@@ -174,19 +187,12 @@ console.log(error);
 };
 
 const selectPlan =
-(planName)=>{
+async(planName)=>{
 
-localStorage.setItem(
-"plan",
-planName
-);
-
-setCurrentPlan(
-planName
-);
+if(!canSelectPlan(planName)){
 
 setMessage(
-`${planName} plan selected successfully`
+"You cannot downgrade your plan"
 );
 
 setTimeout(()=>{
@@ -194,6 +200,64 @@ setTimeout(()=>{
 setMessage("");
 
 },3000);
+
+return;
+
+}
+
+try{
+
+const response =
+await updatePlanApi(planName);
+
+if(
+response.message === "Plan Updated Successfully"
+){
+
+localStorage.setItem(
+"plan",
+response.plan || planName
+);
+
+setCurrentPlan(
+response.plan || planName
+);
+
+setMessage(
+`${planName} plan selected successfully`
+);
+
+}
+else{
+
+setMessage(
+response.message || "Plan update failed"
+);
+
+}
+
+setTimeout(()=>{
+
+setMessage("");
+
+},3000);
+
+}
+catch(error){
+
+console.log(error);
+
+setMessage(
+"Plan update failed"
+);
+
+setTimeout(()=>{
+
+setMessage("");
+
+},3000);
+
+}
 
 };
 
@@ -343,7 +407,6 @@ adminEmail:""
 });
 
 }
-
 catch(error){
 
 console.log(error);
@@ -370,7 +433,6 @@ loadRequests();
 loadUsageData();
 
 }
-
 catch(error){
 
 console.log(error);
@@ -389,7 +451,6 @@ await rejectRequestApi(id);
 loadRequests();
 
 }
-
 catch(error){
 
 console.log(error);
@@ -410,7 +471,6 @@ loadReactivationRequests();
 loadRequests();
 
 }
-
 catch(error){
 
 console.log(error);
@@ -431,7 +491,6 @@ loadReactivationRequests();
 loadRequests();
 
 }
-
 catch(error){
 
 console.log(error);
@@ -450,7 +509,6 @@ await approveLeaveRequestApi(id);
 loadLeaveRequests();
 
 }
-
 catch(error){
 
 console.log(error);
@@ -469,7 +527,6 @@ await rejectLeaveRequestApi(id);
 loadLeaveRequests();
 
 }
-
 catch(error){
 
 console.log(error);
@@ -703,14 +760,27 @@ CURRENT
 <p>✓ Export Access: <strong>{plan.exportAccess}</strong></p>
 
 {
-currentPlan !== plan.name &&
-
+currentPlan === plan.name
+?
+null
+:
+canSelectPlan(plan.name)
+?
 <button
 className="select-plan-btn"
 onClick={()=>selectPlan(plan.name)}
 >
 
 Select {plan.name}
+
+</button>
+:
+<button
+className="select-plan-btn locked-plan-btn"
+disabled
+>
+
+Locked
 
 </button>
 }

@@ -229,24 +229,24 @@ function DashboardPage() {
         role === "admin" && !hasAnalyticsAccess
         ?
 
-        <div className="analytics-plan-card">
+   <div className="analytics-plan-card">
 
-          <h2>
-            Analytics not available on your plan
-          </h2>
+  <h2>
+    Analytics not available on your plan
+  </h2>
 
-          <p>
-            Upgrade to Professional or Enterprise in Settings to unlock dashboard analytics, charts, and KPIs.
-          </p>
+  <p>
+    Upgrade to Professional or Enterprise in{" "}
+    <button
+      className="settings-inline-btn"
+      onClick={() => navigate("/settings")}
+    >
+      Settings
+    </button>
+    {" "}to unlock dashboard analytics, charts, and KPIs.
+  </p>
 
-          <button
-            className="settings-upgrade-btn"
-            onClick={() => navigate("/settings")}
-          >
-            Go to Settings
-          </button>
-
-        </div>
+</div>
 
         :
 

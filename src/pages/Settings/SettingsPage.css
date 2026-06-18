@@ -478,3 +478,11 @@ body.dark-theme .plans-section > p {
     grid-template-columns: 1fr;
   }
 }
+.locked-plan-btn {
+  background: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.locked-plan-btn:hover {
+  background: #94a3b8 !important;
+}
