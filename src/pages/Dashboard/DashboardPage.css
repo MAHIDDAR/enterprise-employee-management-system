@@ -338,3 +338,270 @@ body.dark-theme .analytics-plan-card p {
 .settings-inline-btn:hover {
   text-decoration: underline;
 }
+.security-monitoring-section {
+  margin-top: 24px;
+  margin-bottom: 28px;
+}
+
+.security-header {
+  margin-bottom: 16px;
+}
+
+.security-header h2 {
+  font-size: 22px;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.security-header p {
+  color: #64748b;
+  font-size: 15px;
+}
+
+.security-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.security-summary-card {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.security-summary-card p {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.security-summary-card h3 {
+  color: #0f172a;
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.security-summary-card span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.red-text {
+  color: #ef4444 !important;
+}
+
+.risk-engine-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.risk-card {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.risk-card h3,
+.security-events-card h3 {
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.risk-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.risk-row:last-child {
+  border-bottom: none;
+}
+
+.risk-user-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.risk-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.company-risk-avatar {
+  background: #e0f2fe;
+  color: #2563eb;
+}
+
+.risk-user-left h4 {
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.risk-user-left p {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.risk-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.risk-score-box strong {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.low-risk,
+.medium-risk,
+.high-risk,
+.critical-risk {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.low-risk {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.medium-risk {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.high-risk {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.critical-risk {
+  background: #7f1d1d;
+  color: #ffffff;
+}
+
+.security-events-card {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.security-event-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.security-event-row:last-child {
+  border-bottom: none;
+}
+
+.security-event-row h4 {
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.security-event-row p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.security-event-right {
+  text-align: right;
+  min-width: 160px;
+}
+
+.security-event-right span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.empty-risk-text {
+  color: #64748b;
+  font-size: 14px;
+}
+
+body.dark-theme .security-summary-card,
+body.dark-theme .risk-card,
+body.dark-theme .security-events-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-theme .security-header h2,
+body.dark-theme .security-summary-card h3,
+body.dark-theme .risk-card h3,
+body.dark-theme .security-events-card h3,
+body.dark-theme .risk-user-left h4,
+body.dark-theme .risk-score-box strong,
+body.dark-theme .security-event-row h4 {
+  color: white;
+}
+
+body.dark-theme .security-header p,
+body.dark-theme .security-summary-card p,
+body.dark-theme .security-summary-card span,
+body.dark-theme .risk-user-left p,
+body.dark-theme .security-event-row p,
+body.dark-theme .security-event-right span,
+body.dark-theme .empty-risk-text {
+  color: #cbd5e1;
+}
+
+body.dark-theme .risk-row,
+body.dark-theme .security-event-row {
+  border-color: #334155;
+}
+
+@media(max-width: 1000px) {
+  .security-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .risk-engine-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width: 600px) {
+  .security-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .security-event-row {
+    flex-direction: column;
+  }
+
+  .security-event-right {
+    text-align: left;
+  }
+}

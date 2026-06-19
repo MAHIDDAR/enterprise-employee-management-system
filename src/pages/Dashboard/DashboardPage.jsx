@@ -7,6 +7,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import axios from "axios";
+
 import {
   fetchEmployees,
 } from "../../services/employeeService";
@@ -38,16 +40,9 @@ function DashboardPage() {
   const plan =
     localStorage.getItem("plan") || "Free";
 
-  const userName =
-    localStorage.getItem("email") || "User";
-
   const company =
-    localStorage.getItem("company") || "Company";
+    localStorage.getItem("company") || "Stackly";
 
-  /*
-    Plan restriction is only for admins.
-    Normal users dashboard remains same.
-  */
   const hasAnalyticsAccess =
     role !== "admin" ||
     plan === "Professional" ||
@@ -83,6 +78,21 @@ function DashboardPage() {
     setRoleData,
   ] = useState([]);
 
+  const [
+    securityData,
+    setSecurityData,
+  ] = useState({
+    cards: {
+      securityAlertsToday: 0,
+      openAlerts: 0,
+      resolvedAlerts: 0,
+      criticalAlerts: 0,
+    },
+    topRiskUsers: [],
+    topRiskCompanies: [],
+    recentEvents: [],
+  });
+
   const [loading, setLoading] =
     useState(true);
 
@@ -93,16 +103,49 @@ function DashboardPage() {
     new Date().toLocaleDateString(
       "en-IN",
       {
-        weekday:"long",
-        year:"numeric",
-        month:"long",
-        day:"numeric"
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }
     );
 
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  const loadSecuritySummary = async () => {
+
+    try {
+
+      const response =
+        await axios.get(
+          `http://127.0.0.1:8000/auth/security-summary?company=${company}`
+        );
+
+      setSecurityData(
+        response.data
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      setSecurityData({
+        cards: {
+          securityAlertsToday: 0,
+          openAlerts: 0,
+          resolvedAlerts: 0,
+          criticalAlerts: 0,
+        },
+        topRiskUsers: [],
+        topRiskCompanies: [],
+        recentEvents: [],
+      });
+
+    }
+
+  };
 
   const loadDashboardData = async () => {
 
@@ -114,6 +157,12 @@ function DashboardPage() {
         await fetchEmployees();
 
       setEmployees(employeeData);
+
+      if (role === "admin") {
+
+        await loadSecuritySummary();
+
+      }
 
       if (hasAnalyticsAccess) {
 
@@ -129,13 +178,21 @@ function DashboardPage() {
         const roleAnalytics =
           await getRoleCountApi();
 
-        setAnalyticsData(dashboardAnalytics);
+        setAnalyticsData(
+          dashboardAnalytics
+        );
 
-        setDepartmentData(departmentAnalytics);
+        setDepartmentData(
+          departmentAnalytics
+        );
 
-        setStatusData(statusAnalytics);
+        setStatusData(
+          statusAnalytics
+        );
 
-        setRoleData(roleAnalytics);
+        setRoleData(
+          roleAnalytics
+        );
 
       }
 
@@ -152,7 +209,45 @@ function DashboardPage() {
     } finally {
 
       setLoading(false);
+
     }
+
+  };
+
+  const getRiskClass = (riskLevel) => {
+
+    if (riskLevel === "Critical Risk") {
+      return "critical-risk";
+    }
+
+    if (riskLevel === "High Risk") {
+      return "high-risk";
+    }
+
+    if (riskLevel === "Medium Risk") {
+      return "medium-risk";
+    }
+
+    return "low-risk";
+
+  };
+
+  const getSeverityRiskClass = (severity) => {
+
+    if (severity === "Critical") {
+      return "critical-risk";
+    }
+
+    if (severity === "High") {
+      return "high-risk";
+    }
+
+    if (severity === "Medium") {
+      return "medium-risk";
+    }
+
+    return "low-risk";
+
   };
 
   if (loading) {
@@ -162,6 +257,7 @@ function DashboardPage() {
         Loading dashboard data...
       </div>
     );
+
   }
 
   if (error) {
@@ -171,6 +267,7 @@ function DashboardPage() {
         {error}
       </div>
     );
+
   }
 
   return (
@@ -226,63 +323,364 @@ function DashboardPage() {
       </div>
 
       {
-        role === "admin" && !hasAnalyticsAccess
-        ?
+        role === "admin" && !hasAnalyticsAccess && (
 
-   <div className="analytics-plan-card">
+          <div className="analytics-plan-card">
 
-  <h2>
-    Analytics not available on your plan
-  </h2>
+            <h2>
+              Analytics not available on your plan
+            </h2>
 
-  <p>
-    Upgrade to Professional or Enterprise in{" "}
-    <button
-      className="settings-inline-btn"
-      onClick={() => navigate("/settings")}
-    >
-      Settings
-    </button>
-    {" "}to unlock dashboard analytics, charts, and KPIs.
-  </p>
-
-</div>
-
-        :
-
-        <>
-
-          <DashboardCards
-            employees={employees}
-            analyticsData={analyticsData}
-          />
-
-          <div className="dashboard-grid">
-
-            <EmployeeChart employees={employees} />
-
-            <EmployeeTable employees={employees} />
-
-            <AttendanceChart
-              statusData={statusData}
-            />
-
-            <DepartmentDistributionChart
-              departmentData={departmentData}
-            />
-
-            <RoleCountChart
-              roleData={roleData}
-            />
+            <p>
+              Upgrade to Professional or Enterprise in{" "}
+              <button
+                className="settings-inline-btn"
+                onClick={() => navigate("/settings")}
+              >
+                Settings
+              </button>
+              {" "}to unlock dashboard analytics, charts, and KPIs.
+            </p>
 
           </div>
 
-        </>
+        )
+      }
 
+      {
+        hasAnalyticsAccess && (
+
+          <>
+
+            <DashboardCards
+              employees={employees}
+              analyticsData={analyticsData}
+            />
+
+            <div className="dashboard-grid">
+
+              <EmployeeChart
+                employees={employees}
+              />
+
+              <EmployeeTable
+                employees={employees}
+              />
+
+              <AttendanceChart
+                statusData={statusData}
+              />
+
+              <DepartmentDistributionChart
+                departmentData={departmentData}
+              />
+
+              <RoleCountChart
+                roleData={roleData}
+              />
+
+            </div>
+
+          </>
+
+        )
+      }
+
+      {
+        role === "admin" && (
+
+          <div className="security-monitoring-section">
+
+            <div className="security-header">
+
+              <h2>
+                🛡️ Security Monitoring
+              </h2>
+
+              <p>
+                Track alerts, risk scores, and recent security events for your organization.
+              </p>
+
+            </div>
+
+            <div className="security-card-grid">
+
+              <div className="security-summary-card">
+
+                <p>
+                  Security Alerts Today
+                </p>
+
+                <h3>
+                  {securityData.cards.securityAlertsToday}
+                </h3>
+
+                <span>
+                  Generated today
+                </span>
+
+              </div>
+
+              <div className="security-summary-card">
+
+                <p>
+                  Open Alerts
+                </p>
+
+                <h3 className="red-text">
+                  {securityData.cards.openAlerts}
+                </h3>
+
+                <span>
+                  Needs attention
+                </span>
+
+              </div>
+
+              <div className="security-summary-card">
+
+                <p>
+                  Resolved Alerts
+                </p>
+
+                <h3>
+                  {securityData.cards.resolvedAlerts}
+                </h3>
+
+                <span>
+                  Closed incidents
+                </span>
+
+              </div>
+
+              <div className="security-summary-card">
+
+                <p>
+                  Critical Alerts
+                </p>
+
+                <h3 className="red-text">
+                  {securityData.cards.criticalAlerts}
+                </h3>
+
+                <span>
+                  Open critical issues
+                </span>
+
+              </div>
+
+            </div>
+
+            <div className="risk-engine-grid">
+
+              <div className="risk-card">
+
+                <h3>
+                  Top Risk Users
+                </h3>
+
+                {
+                  securityData.topRiskUsers.length === 0
+                  ?
+                  <p className="empty-risk-text">
+                    No risk users found
+                  </p>
+                  :
+                  securityData.topRiskUsers.map(
+                    (user, index) => (
+
+                      <div
+                        key={index}
+                        className="risk-row"
+                      >
+
+                        <div className="risk-user-left">
+
+                          <div className="risk-avatar">
+                            {
+                              user.name
+                              ?
+                              user.name.slice(0, 2).toUpperCase()
+                              :
+                              "NA"
+                            }
+                          </div>
+
+                          <div>
+
+                            <h4>
+                              {user.name}
+                            </h4>
+
+                            <p>
+                              {user.email}
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                        <div className="risk-score-box">
+
+                          <strong>
+                            {user.riskScore}
+                          </strong>
+
+                          <span
+                            className={getRiskClass(
+                              user.riskLevel
+                            )}
+                          >
+                            {user.riskLevel}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    )
+                  )
+                }
+
+              </div>
+
+              <div className="risk-card">
+
+                <h3>
+                  Top Risk Companies
+                </h3>
+
+                {
+                  securityData.topRiskCompanies.length === 0
+                  ?
+                  <p className="empty-risk-text">
+                    No company risk found
+                  </p>
+                  :
+                  securityData.topRiskCompanies.map(
+                    (item, index) => (
+
+                      <div
+                        key={index}
+                        className="risk-row"
+                      >
+
+                        <div className="risk-user-left">
+
+                          <div className="risk-avatar company-risk-avatar">
+                            🏢
+                          </div>
+
+                          <div>
+
+                            <h4>
+                              {item.company}
+                            </h4>
+
+                            <p>
+                              {item.usersTracked} users tracked
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                        <div className="risk-score-box">
+
+                          <strong>
+                            {item.riskScore}
+                          </strong>
+
+                          <span
+                            className={getRiskClass(
+                              item.riskLevel
+                            )}
+                          >
+                            {item.riskLevel}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    )
+                  )
+                }
+
+              </div>
+
+            </div>
+
+            <div className="security-events-card">
+
+              <h3>
+                Recent Security Events
+              </h3>
+
+              {
+                securityData.recentEvents.length === 0
+                ?
+                <p className="empty-risk-text">
+                  No recent security events
+                </p>
+                :
+                securityData.recentEvents.map(
+                  (event) => (
+
+                    <div
+                      key={event.id}
+                      className="security-event-row"
+                    >
+
+                      <div>
+
+                        <h4>
+                          {event.eventType}
+                        </h4>
+
+                        <p>
+                          {event.details}
+                        </p>
+
+                      </div>
+
+                      <div className="security-event-right">
+
+                        <p>
+                          {event.userName}
+                        </p>
+
+                        <span>
+                          {event.createdAt}
+                        </span>
+
+                        <strong
+                          className={getSeverityRiskClass(
+                            event.severity
+                          )}
+                        >
+                          {event.severity}
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+                  )
+                )
+              }
+
+            </div>
+
+          </div>
+
+        )
       }
 
     </div>
+
   );
+
 }
 
 export default DashboardPage;
