@@ -18,6 +18,7 @@ import SignupPage from "../pages/SignupPage/SignupPage";
 import AuditLogsPage from "../pages/AuditLogs/AuditLogsPage";
 import InvitationsPage from "../pages/Invitations/InvitationsPage";
 import AccountDeactivatedPage from "../pages/AccountDeactivated/AccountDeactivatedPage";
+import DemandForecastingPage from "../pages/DemandForecasting/DemandForecastingPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -62,6 +63,11 @@ function AppRoutes() {
             <Route
               path="/dashboard"
               element={<DashboardPage />}
+            />
+
+            <Route
+              path="/demand-forecasting"
+              element={<DemandForecastingPage />}
             />
 
             <Route

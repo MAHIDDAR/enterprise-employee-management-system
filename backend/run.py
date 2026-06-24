@@ -20,6 +20,7 @@ from app.routes.audit_routes import audit_router
 from app.routes.analytics_routes import analytics_router
 from app.routes.invitation_routes import invitation_router
 from app.routes.attendance_routes import attendance_router
+from app.routes.forecast_routes import forecast_router
 
 
 # CREATE DATABASE TABLES
@@ -59,6 +60,8 @@ app.include_router(analytics_router)
 app.include_router(invitation_router)
 
 app.include_router(attendance_router)
+
+app.include_router(forecast_router)
 
 
 @app.get("/")

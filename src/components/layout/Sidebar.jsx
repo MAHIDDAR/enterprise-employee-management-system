@@ -17,6 +17,7 @@ import {
   FaSignOutAlt,
   FaUserCircle,
   FaEnvelopeOpenText,
+  FaChartLine,
 } from "react-icons/fa";
 
 import "./Sidebar.css";
@@ -48,56 +49,62 @@ function Sidebar() {
   const menuItems = [
 
     {
-      name:"Dashboard",
-      path:"/dashboard",
-      icon:<FaHome/>
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: <FaHome />
     },
 
     {
-      name:"Employees",
-      path:"/employees",
-      icon:<FaUsers/>
+      name: "Demand Forecasting",
+      path: "/demand-forecasting",
+      icon: <FaChartLine />
     },
 
     {
-      name:"Attendance",
-      path:"/attendance",
-      icon:<FaCalendarCheck/>
+      name: "Employees",
+      path: "/employees",
+      icon: <FaUsers />
+    },
+
+    {
+      name: "Attendance",
+      path: "/attendance",
+      icon: <FaCalendarCheck />
     }
 
   ];
 
-  if(role==="admin"){
+  if (role === "admin") {
 
     menuItems.push({
 
-      name:"Company",
-      path:"/company",
-      icon:<FaBuilding/>
+      name: "Company",
+      path: "/company",
+      icon: <FaBuilding />
 
     });
 
     menuItems.push({
 
-      name:"Invitations",
-      path:"/invitations",
-      icon:<FaEnvelopeOpenText/>
+      name: "Invitations",
+      path: "/invitations",
+      icon: <FaEnvelopeOpenText />
 
     });
 
     menuItems.push({
 
-      name:"Departments",
-      path:"/departments",
-      icon:<FaBuilding/>
+      name: "Departments",
+      path: "/departments",
+      icon: <FaBuilding />
 
     });
 
     menuItems.push({
 
-      name:"Audit Logs",
-      path:"/audit-logs",
-      icon:<FaClipboardList/>
+      name: "Audit Logs",
+      path: "/audit-logs",
+      icon: <FaClipboardList />
 
     });
 
@@ -105,9 +112,9 @@ function Sidebar() {
 
   menuItems.push({
 
-    name:"Settings",
-    path:"/settings",
-    icon:<FaCog/>
+    name: "Settings",
+    path: "/settings",
+    icon: <FaCog />
 
   });
 
@@ -125,16 +132,12 @@ function Sidebar() {
 
         {
 
-          menuItems.map((item)=>(
+          menuItems.map((item) => (
 
             <NavLink
-
               key={item.name}
-
               to={item.path}
-
               className="nav-item"
-
             >
 
               <span className="nav-icon">
